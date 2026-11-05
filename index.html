@@ -71,13 +71,19 @@
             </button>
         </nav>
 
-        <div class="hidden md:block p-4 border-t border-slate-800 mt-auto">
+        <div class="hidden md:block p-4 border-t border-slate-800 mt-auto space-y-2">
             <div class="bg-slate-800/60 rounded-xl p-3 text-xs text-slate-400 space-y-2">
                 <div class="flex items-center justify-between">
                     <span class="font-semibold text-slate-300">Sesión:</span>
                     <span id="auth-status-badge" class="px-2 py-0.5 rounded-full text-[10px] bg-slate-700 text-slate-300 font-medium">Cliente</span>
                 </div>
-                <button onclick="openLoginModal()" class="w-full text-center py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold transition shadow-md">🔐 Cambiar Usuario</button>
+                <button onclick="openLoginModal()" class="w-full text-center py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg font-medium transition text-xs">🔐 Cambiar Usuario</button>
+                <button onclick="openPasswordModal()" class="w-full text-center py-2 bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-400 rounded-lg font-medium transition text-xs flex items-center justify-center gap-1.5">
+                    <i data-lucide="key" class="w-3.5 h-3.5"></i> Cambiar Contraseña
+                </button>
+                <button onclick="logoutSession()" class="w-full text-center py-2 bg-rose-600/20 hover:bg-rose-600/30 text-rose-400 rounded-lg font-medium transition text-xs flex items-center justify-center gap-1.5">
+                    <i data-lucide="log-out" class="w-3.5 h-3.5"></i> Cerrar Sesión
+                </button>
             </div>
         </div>
     </aside>
@@ -97,7 +103,7 @@
             <div class="flex items-center justify-between sm:justify-center gap-3 bg-indigo-50/70 border border-indigo-100 px-3.5 py-2 rounded-2xl w-full sm:w-auto">
                 <div class="flex items-center gap-2">
                     <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-                    <span class="text-xs font-bold text-indigo-900">BCV Automática:</span>
+                    <span class="text-xs font-bold text-indigo-900">Tasa BCV:</span>
                 </div>
                 <div class="flex items-center gap-2">
                     <span id="bcv-rate-display" class="text-xs sm:text-sm font-black text-indigo-700">Cargando...</span>
@@ -623,7 +629,7 @@
                 <h3 class="font-bold text-slate-900 text-lg flex items-center gap-2">
                     <i data-lucide="lock" class="w-5 h-5 text-indigo-600"></i> Iniciar Sesión Nubea
                 </h3>
-                <button onclick="closeLoginModal()" class="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400">
+                <button onclick="closeLoginModal()" id="close-login-btn" class="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400 hidden">
                     <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
             </div>
@@ -635,11 +641,35 @@
                 </div>
                 <button onclick="verifyLogin()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl shadow-lg transition text-sm">Acceder al Sistema</button>
             </div>
-            <div class="text-[11px] text-slate-400 text-center space-y-1 bg-slate-50 p-3 rounded-xl border">
-                <p><b>Claves de Acceso:</b></p>
-                <p>• Admin: <code class="text-indigo-600 font-semibold">admin2026</code></p>
-                <p>• Suministros Eléctricos Ariza: <code class="text-indigo-600 font-semibold">ariza123</code></p>
-                <p>• Los Llanos Lubricantes: <code class="text-indigo-600 font-semibold">llanos123</code></p>
+            
+        </div>
+    </div>
+
+    <!-- Modal: Cambiar Contraseña -->
+    <div id="password-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl space-y-4 border border-slate-100">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
+                    <i data-lucide="key" class="w-5 h-5 text-indigo-600"></i> Cambiar Contraseña
+                </h3>
+                <button onclick="closePasswordModal()" class="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Contraseña Actual:</label>
+                    <input type="password" id="current-password-input" placeholder="••••••••" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Nueva Contraseña:</label>
+                    <input type="password" id="new-password-input" placeholder="••••••••" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Confirmar Nueva Contraseña:</label>
+                    <input type="password" id="confirm-password-input" placeholder="••••••••" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none">
+                </div>
+                <button onclick="updatePassword()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl shadow-lg transition text-sm mt-2">Guardar Nueva Contraseña</button>
             </div>
         </div>
     </div>
@@ -726,7 +756,7 @@
 
     <!-- Application Script Logic -->
     <script>
-        const USERS_DB = {
+        let USERS_DB = JSON.parse(localStorage.getItem('si_users_db')) || {
             "admin2026": {
                 role: "admin",
                 idKey: "admin",
@@ -756,13 +786,13 @@
             }
         };
 
-        let currentUser = JSON.parse(localStorage.getItem('si_current_user')) || USERS_DB["ariza123"];
+        // Cargar sesión persistente de localStorage; si no existe, se mantiene en null para pedir login inicial
+        let currentUser = JSON.parse(localStorage.getItem('si_current_user')) || null;
         let bcvRate = parseFloat(localStorage.getItem('si_bcv_rate')) || 893.22;
 
         const DEFAULT_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzGKXU72cclZhFT8e8R1LZtw54Vpmvor03rqEW1D0nMa5JNvU3f0l_7HMm-HTdbo7vs/exec";
         let cloudWebhook = localStorage.getItem('si_cloud_url') || DEFAULT_APPS_SCRIPT_URL;
 
-        // Gestión de Familias Dinámicas por el Cliente
         let families = JSON.parse(localStorage.getItem('si_families')) || [
             { code: 'ELE', name: 'Suministros Eléctricos' },
             { code: 'LUB', name: 'Lubricantes y Fluidos' },
@@ -795,7 +825,13 @@
             renderCheckerResults();
             renderHistory();
             renderQuotesHistory();
-            updateAuthUI();
+            
+            if (currentUser) {
+                updateAuthUI();
+            } else {
+                openLoginModal();
+            }
+
             document.getElementById('cloud-webhook-url').value = cloudWebhook;
 
             document.addEventListener('click', function(e) {
@@ -868,29 +904,96 @@
         }
 
         function openLoginModal() {
+            if (currentUser) {
+                document.getElementById('close-login-btn').classList.remove('hidden');
+            } else {
+                document.getElementById('close-login-btn').classList.add('hidden');
+            }
             document.getElementById('login-modal').classList.remove('hidden');
         }
 
         function closeLoginModal() {
+            if (!currentUser) return showToast('Debes iniciar sesión para continuar', 'error');
             document.getElementById('login-modal').classList.add('hidden');
         }
 
         function verifyLogin() {
             const pass = document.getElementById('login-password-input').value.trim();
             if (USERS_DB[pass]) {
-                currentUser = USERS_DB[pass];
+                currentUser = { ...USERS_DB[pass], currentPasswordKey: pass };
                 localStorage.setItem('si_current_user', JSON.stringify(currentUser));
                 closeLoginModal();
                 updateAuthUI();
                 switchTab('inventory');
-                showToast(`Sesión activa: ${currentUser.name}`);
+                showToast(`Bienvenido, ${currentUser.name}`);
             } else {
                 showToast('Contraseña incorrecta', 'error');
             }
             document.getElementById('login-password-input').value = '';
         }
 
+        function logoutSession() {
+            if (confirm('¿Estás seguro de cerrar sesión?')) {
+                currentUser = null;
+                localStorage.removeItem('si_current_user');
+                showToast('Sesión cerrada correctamente');
+                openLoginModal();
+            }
+        }
+
+        // --- Funciones para Cambiar Contraseña ---
+        function openPasswordModal() {
+            document.getElementById('current-password-input').value = '';
+            document.getElementById('new-password-input').value = '';
+            document.getElementById('confirm-password-input').value = '';
+            document.getElementById('password-modal').classList.remove('hidden');
+        }
+
+        function closePasswordModal() {
+            document.getElementById('password-modal').classList.add('hidden');
+        }
+
+        function updatePassword() {
+            const currentPass = document.getElementById('current-password-input').value.trim();
+            const newPass = document.getElementById('new-password-input').value.trim();
+            const confirmPass = document.getElementById('confirm-password-input').value.trim();
+
+            if (!currentPass || !newPass || !confirmPass) {
+                return showToast('Por favor completa todos los campos', 'error');
+            }
+
+            if (!currentUser || currentUser.currentPasswordKey !== currentPass) {
+                return showToast('La contraseña actual es incorrecta', 'error');
+            }
+
+            if (newPass.length < 4) {
+                return showToast('La nueva contraseña debe tener al menos 4 caracteres', 'error');
+            }
+
+            if (newPass !== confirmPass) {
+                return showToast('Las nuevas contraseñas no coinciden', 'error');
+            }
+
+            if (USERS_DB[newPass]) {
+                return showToast('Esta contraseña ya está en uso por otro usuario', 'error');
+            }
+
+            // Actualizar en USERS_DB
+            const userData = USERS_DB[currentPass];
+            delete USERS_DB[currentPass];
+            USERS_DB[newPass] = userData;
+            localStorage.setItem('si_users_db', JSON.stringify(USERS_DB));
+
+            // Actualizar sesión actual
+            currentUser.currentPasswordKey = newPass;
+            localStorage.setItem('si_current_user', JSON.stringify(currentUser));
+
+            closePasswordModal();
+            showToast('¡Contraseña actualizada con éxito!');
+        }
+
         function updateAuthUI() {
+            if (!currentUser) return;
             const badge = document.getElementById('auth-status-badge');
             const avatar = document.getElementById('user-avatar');
             const roleLabel = document.getElementById('user-role-label');
@@ -950,13 +1053,14 @@
         }
 
         function switchTab(tab) {
+            if (!currentUser) return openLoginModal();
             if (tab === 'quote' && currentUser.idKey === 'ariza') {
                 showToast('Acceso no autorizado para Suministros Eléctricos Ariza', 'error');
                 return;
             }
 
             const tabs = ['inventory', 'checker', 'invoice', 'quote', 'history'];
-            if (currentUser.role === 'admin') tabs.push('cloud');
+            if (currentUser && currentUser.role === 'admin') tabs.push('cloud');
 
             tabs.forEach(t => {
                 const viewElem = document.getElementById(`view-${t}`);
