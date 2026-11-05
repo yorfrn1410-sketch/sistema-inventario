@@ -1,18 +1,18 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="h-full">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Inventario & Facturación Cloud</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Nubea - Gestión Cloud de Inventario y Facturación</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- html2pdf Library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- jsPDF & AutoTable for PDF Generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -20,535 +20,1311 @@
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
                     },
-                    colors: {
-                        brand: {
-                            50: '#f0f9ff',
-                            100: '#e0f2fe',
-                            500: '#0284c7',
-                            600: '#0369a1',
-                            700: '#075985',
-                        }
-                    }
                 }
             }
         }
     </script>
-    <style>
-        .invoice-print-area {
-            background-color: #ffffff;
-            color: #111827;
-        }
-    </style>
 </head>
-<body class="bg-slate-100 font-sans text-slate-800 antialiased min-h-screen flex flex-col">
-    <script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-analytics.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
+<body class="bg-slate-50 font-sans h-full flex flex-col md:flex-row text-slate-800 antialiased overflow-x-hidden">
 
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyAVma4G39mGFZqQT5I6orISkWYhc3DKbwg",
-    authDomain: "factupro2026-a0787.firebaseapp.com",
-    projectId: "factupro2026-a0787",
-    storageBucket: "factupro2026-a0787.firebasestorage.app",
-    messagingSenderId: "374413273711",
-    appId: "1:374413273711:web:a554f9fb4811cf5a813b9a",
-    measurementId: "G-VVXDJBCZT3"
-  };
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-xs w-full px-4 sm:px-0"></div>
 
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-</script>
-    <!-- Top Navigation Bar -->
-    <header class="bg-slate-900 text-white shadow-md sticky top-0 z-30">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
-                <div class="flex items-center space-x-3">
-                    <div class="bg-sky-500 text-white p-2 rounded-lg flex items-center justify-center">
-                        <i class="fa-solid fa-boxes-stacked text-xl"></i>
-                    </div>
-                    <div>
-                        <h1 class="font-bold text-lg leading-tight">Factupro 2026</h1>
-                        <p class="text-xs text-slate-400">Sistema de Gestión Integrado</p>
-                    </div>
+    <!-- Sidebar Navigation -->
+    <aside class="w-full md:w-64 bg-slate-900 text-slate-300 flex flex-col shadow-xl z-20 shrink-0">
+        <div class="p-5 sm:p-6 border-b border-slate-800 flex items-center justify-between md:justify-start gap-3">
+            <div class="flex items-center gap-3">
+                <div class="bg-gradient-to-tr from-indigo-600 to-violet-500 p-2.5 rounded-2xl text-white shadow-lg shadow-indigo-500/30 flex items-center justify-center">
+                    <i data-lucide="cloud" class="w-6 h-6"></i>
                 </div>
-
-                <!-- Sync Status Indicator -->
-                <div class="hidden sm:flex items-center space-x-2 text-xs bg-slate-800 border border-slate-700 px-3 py-1.5 rounded-full">
-                    <span id="sync-dot" class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <span id="sync-text" class="text-slate-300">Modo Local / Listo para Drive</span>
+                <div>
+                    <h1 id="sidebar-business-name" class="font-black text-white text-base tracking-wide">Nubea</h1>
+                    <p id="sidebar-role-desc" class="text-[11px] text-slate-400">Sistema Cloud Free</p>
                 </div>
             </div>
         </div>
-    </header>
 
-    <!-- Main Container -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-grow w-full">
+        <nav class="flex flex-row md:flex-col p-3 md:p-4 gap-1 overflow-x-auto md:overflow-visible shrink-0 bg-slate-900/90 border-b md:border-b-0 border-slate-800">
+            <button onclick="switchTab('inventory')" id="nav-inventory" class="flex-1 md:flex-none flex items-center justify-center md:justify-start gap-3 px-3 md:px-4 py-2.5 md:py-3 rounded-xl font-medium transition-all text-left bg-indigo-600 text-white shadow-lg shadow-indigo-600/20 text-xs md:text-sm whitespace-nowrap">
+                <i data-lucide="package" class="w-4 h-4 md:w-5 md:h-5"></i>
+                <span class="hidden sm:inline">Inventario</span>
+            </button>
+            <button onclick="switchTab('checker')" id="nav-checker" class="flex-1 md:flex-none flex items-center justify-center md:justify-start gap-3 px-3 md:px-4 py-2.5 md:py-3 rounded-xl font-medium transition-all text-left text-slate-400 hover:bg-slate-800 hover:text-white text-xs md:text-sm whitespace-nowrap">
+                <i data-lucide="search" class="w-4 h-4 md:w-5 md:h-5"></i>
+                <span class="hidden sm:inline">Consultor de Precio</span>
+            </button>
+            <button onclick="switchTab('invoice')" id="nav-invoice" class="flex-1 md:flex-none flex items-center justify-center md:justify-start gap-3 px-3 md:px-4 py-2.5 md:py-3 rounded-xl font-medium transition-all text-left text-slate-400 hover:bg-slate-800 hover:text-white text-xs md:text-sm whitespace-nowrap">
+                <i data-lucide="receipt" class="w-4 h-4 md:w-5 md:h-5"></i>
+                <span class="hidden sm:inline">Facturación</span>
+            </button>
+            <button onclick="switchTab('quote')" id="nav-quote" class="flex-1 md:flex-none flex items-center justify-center md:justify-start gap-3 px-3 md:px-4 py-2.5 md:py-3 rounded-xl font-medium transition-all text-left text-slate-400 hover:bg-slate-800 hover:text-white text-xs md:text-sm whitespace-nowrap">
+                <i data-lucide="calculator" class="w-4 h-4 md:w-5 md:h-5"></i>
+                <span class="hidden sm:inline">Cotizaciones</span>
+            </button>
+            <button onclick="switchTab('history')" id="nav-history" class="flex-1 md:flex-none flex items-center justify-center md:justify-start gap-3 px-3 md:px-4 py-2.5 md:py-3 rounded-xl font-medium transition-all text-left text-slate-400 hover:bg-slate-800 hover:text-white text-xs md:text-sm whitespace-nowrap">
+                <i data-lucide="file-text" class="w-4 h-4 md:w-5 md:h-5"></i>
+                <span class="hidden sm:inline">Historial</span>
+            </button>
+            <button onclick="switchTab('cloud')" id="nav-cloud" class="hidden items-center justify-center md:justify-start gap-3 px-3 md:px-4 py-2.5 md:py-3 rounded-xl font-medium transition-all text-left text-slate-400 hover:bg-slate-800 hover:text-white text-xs md:text-sm whitespace-nowrap">
+                <i data-lucide="cloud-cog" class="w-4 h-4 md:w-5 md:h-5"></i>
+                <span class="hidden sm:inline">Drive</span>
+            </button>
+        </nav>
+
+        <div class="hidden md:block p-4 border-t border-slate-800 mt-auto">
+            <div class="bg-slate-800/60 rounded-xl p-3 text-xs text-slate-400 space-y-2">
+                <div class="flex items-center justify-between">
+                    <span class="font-semibold text-slate-300">Sesión:</span>
+                    <span id="auth-status-badge" class="px-2 py-0.5 rounded-full text-[10px] bg-slate-700 text-slate-300 font-medium">Cliente</span>
+                </div>
+                <button onclick="openLoginModal()" class="w-full text-center py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold transition shadow-md">🔐 Cambiar Usuario</button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 flex flex-col h-full overflow-y-auto">
         
-        <!-- Navigation Tabs -->
-        <div class="flex border-b border-slate-200 mb-6 bg-white rounded-t-xl px-4 pt-2 shadow-sm">
-            <button id="tab-billing-btn" onclick="switchTab('billing')" class="tab-btn flex items-center space-x-2 py-3 px-5 font-medium text-sm border-b-2 border-sky-600 text-sky-600 transition-colors">
-                <i class="fa-solid fa-file-invoice-dollar text-base"></i>
-                <span>Modulo Facturación</span>
-            </button>
-            <button id="tab-inventory-btn" onclick="switchTab('inventory')" class="tab-btn flex items-center space-x-2 py-3 px-5 font-medium text-sm border-b-2 border-transparent text-slate-500 hover:text-slate-700 transition-colors">
-                <i class="fa-solid fa-box text-base"></i>
-                <span>Gestión de Inventario</span>
-                <span id="inventory-badge" class="ml-1 bg-sky-100 text-sky-800 text-xs font-semibold px-2 py-0.5 rounded-full">0</span>
-            </button>
-            <button id="tab-cloud-btn" onclick="switchTab('cloud')" class="tab-btn flex items-center space-x-2 py-3 px-5 font-medium text-sm border-b-2 border-transparent text-slate-500 hover:text-slate-700 transition-colors">
-                <i class="fa-solid fa-cloud-arrow-up text-base"></i>
-                <span>Conectar Nube (Drive)</span>
-            </button>
-        </div>
-
-        <!-- MODULE 1: FACTURACIÓN -->
-        <section id="module-billing" class="space-y-6">
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                
-                <!-- Left Column: Form & Item Addition -->
-                <div class="lg:col-span-7 space-y-6">
-                    
-                    <!-- Customer Data Card -->
-                    <div class="bg-white rounded-xl shadow-sm p-5 border border-slate-200">
-                        <h2 class="text-base font-semibold text-slate-800 mb-4 flex items-center">
-                            <i class="fa-solid fa-user-tag text-sky-600 mr-2"></i> Datos del Cliente
-                        </h2>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-xs font-medium text-slate-600 mb-1">Nombre / Razón Social *</label>
-                                <input type="text" id="client-name" value="Empresa Cliente S.A." placeholder="Ej. Juan Pérez" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:outline-none">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-medium text-slate-600 mb-1">Identificación / RUC / NIT *</label>
-                                <input type="text" id="client-id" value="123456789001" placeholder="Ej. 1045896321" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:outline-none">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-medium text-slate-600 mb-1">Correo Electrónico</label>
-                                <input type="email" id="client-email" value="contacto@cliente.com" placeholder="correo@ejemplo.com" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:outline-none">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-medium text-slate-600 mb-1">Dirección</label>
-                                <input type="text" id="client-address" value="Av. Principal #456, Ciudad" placeholder="Dirección de facturación" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:outline-none">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Add Products Card -->
-                    <div class="bg-white rounded-xl shadow-sm p-5 border border-slate-200">
-                        <h2 class="text-base font-semibold text-slate-800 mb-4 flex items-center">
-                            <i class="fa-solid fa-cart-plus text-sky-600 mr-2"></i> AGREGAR PRODUCTOS
-                        </h2>
-                        <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
-                            <div class="sm:col-span-6">
-                                <label class="block text-xs font-medium text-slate-600 mb-1">Seleccionar Producto</label>
-                                <select id="select-product" onchange="handleProductSelect()" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:outline-none">
-                                    <option value="">-- Buscar por nombre o código --</option>
-                                </select>
-                            </div>
-                            <div class="sm:col-span-3">
-                                <label class="block text-xs font-medium text-slate-600 mb-1">Cantidad</label>
-                                <input type="number" id="input-qty" min="1" value="1" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:outline-none">
-                            </div>
-                            <div class="sm:col-span-3">
-                                <button onclick="addItemToInvoice()" class="w-full bg-sky-600 hover:bg-sky-700 text-white font-medium py-2 px-3 rounded-lg text-sm transition-colors flex items-center justify-center space-x-1 shadow-sm">
-                                    <i class="fa-solid fa-plus text-xs"></i>
-                                    <span>Agregar</span>
-                                </button>
-                            </div>
-                        </div>
-                        <div id="stock-warning" class="mt-2 text-xs text-amber-600 font-medium hidden"></div>
-                    </div>
-
-                    <!-- Items Table -->
-                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                        <div class="p-4 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
-                            <h3 class="font-semibold text-sm text-slate-700">Detalle de la Factura</h3>
-                            <span id="items-count" class="text-xs text-slate-500">0 ítems agregados</span>
-                        </div>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left text-sm">
-                                <thead class="bg-slate-100 text-slate-600 text-xs uppercase font-medium">
-                                    <tr>
-                                        <th class="px-4 py-3">Código</th>
-                                        <th class="px-4 py-3">Descripción</th>
-                                        <th class="px-4 py-3 text-center">Cant.</th>
-                                        <th class="px-4 py-3 text-right">Precio U.</th>
-                                        <th class="px-4 py-3 text-right">Subtotal</th>
-                                        <th class="px-4 py-3 text-center">Acción</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="invoice-items-table" class="divide-y divide-slate-200">
-                                    <!-- Items dinámicos -->
-                                    <tr id="empty-invoice-row">
-                                        <td colspan="6" class="text-center py-8 text-slate-400 italic text-xs">
-                                            No hay productos agregados a esta factura.
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <!-- Summary -->
-                        <div class="p-4 bg-slate-50 border-t border-slate-200 flex flex-col items-end space-y-1 text-sm">
-                            <div class="flex justify-between w-48 text-slate-600 text-xs">
-                                <span>Subtotal:</span>
-                                <span id="summary-subtotal" class="font-medium">$0.00</span>
-                            </div>
-                            <div class="flex justify-between w-48 text-slate-600 text-xs">
-                                <span>IVA (16%):</span>
-                                <span id="summary-tax" class="font-medium">$0.00</span>
-                            </div>
-                            <div class="flex justify-between w-48 text-slate-800 text-base font-bold pt-2 border-t border-slate-300">
-                                <span>Total:</span>
-                                <span id="summary-total" class="text-sky-600">$0.00</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Right Column: PDF Preview Card & Actions -->
-                <div class="lg:col-span-5 space-y-4">
-                    <div class="bg-slate-800 text-white rounded-xl shadow-lg p-4 flex justify-between items-center">
-                        <div>
-                            <h3 class="font-bold text-sm">Previsualización de Factura</h3>
-                            <p class="text-xs text-slate-400">El formato listo para exportar a PDF</p>
-                        </div>
-                        <button onclick="generatePDF()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-4 py-2 rounded-lg text-sm transition-all shadow flex items-center space-x-2">
-                            <i class="fa-solid fa-file-pdf"></i>
-                            <span>Descargar PDF</span>
-                        </button>
-                    </div>
-
-                    <!-- PDF Template Preview Canvas -->
-                    <div class="bg-slate-200 p-3 rounded-xl overflow-y-auto max-h-[700px] border border-slate-300">
-                        <div id="invoice-pdf-template" class="invoice-print-area p-8 shadow-xl rounded max-w-full text-slate-800 text-xs leading-relaxed mx-auto">
-                            
-                            <!-- Invoice Header -->
-                            <div class="flex justify-between items-start border-b border-slate-200 pb-6 mb-6">
-                                <div>
-                                    <h1 class="text-xl font-bold text-slate-900 uppercase tracking-wide">EMPRENDIMIENTO OLGA ARTEAGA</h1>
-                                    <p class="text-slate-500">RIF: J508720075 </p>
-                                    <p class="text-slate-500">Av Circunvalación Sur Casa Nro 39-25F Barrio Fe y Alegria Acarigua Estado Portuguesa</p>
-                                    <p class="text-slate-500">Teléfono: 0414-5613691</p>
-                                </div>
-                                <div class="text-right">
-                                    <span class="inline-block bg-sky-100 text-sky-800 font-bold px-3 py-1 rounded text-xs uppercase mb-2">Factura de Venta</span>
-                                    <p class="font-bold text-sm text-slate-800" id="pdf-invoice-number">FAC-0001</p>
-                                    <p class="text-slate-500">Fecha: <span id="pdf-invoice-date">--/--/----</span></p>
-                                </div>
-                            </div>
-
-                            <!-- Customer Info in Invoice -->
-                            <div class="bg-slate-50 p-3 rounded-lg mb-6 border border-slate-100">
-                                <h4 class="font-bold text-slate-700 border-b border-slate-200 pb-1 mb-2 text-xs uppercase">Cliente</h4>
-                                <div class="grid grid-cols-2 gap-2 text-xs">
-                                    <div>
-                                        <p class="text-slate-500">Nombre/Razón Social:</p>
-                                        <p class="font-semibold text-slate-800" id="pdf-client-name">*Empresa Cliente S.A.*</p>
-                                    </div>
-                                    <div>
-                                        <p class="text-slate-500">Identificación:</p>
-                                        <p class="font-semibold text-slate-800" id="pdf-client-id">123456789001</p>
-                                    </div>
-                                    <div>
-                                        <p class="text-slate-500">Email:</p>
-                                        <p class="text-slate-800" id="pdf-client-email">contacto@cliente.com</p>
-                                    </div>
-                                    <div>
-                                        <p class="text-slate-500">Dirección:</p>
-                                        <p class="text-slate-800" id="pdf-client-address">Av. Principal #456</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Items Table in Invoice -->
-                            <table class="w-full text-left mb-6 border-collapse">
-                                <thead>
-                                    <tr class="bg-slate-800 text-white text-[10px] uppercase">
-                                        <th class="p-2 rounded-l">Código</th>
-                                        <th class="p-2">Descripción</th>
-                                        <th class="p-2 text-center">Cant.</th>
-                                        <th class="p-2 text-right">P. Unit</th>
-                                        <th class="p-2 text-right rounded-r">Total</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="pdf-items-body" class="divide-y divide-slate-200 text-xs">
-                                    <tr>
-                                        <td colspan="5" class="text-center py-4 text-slate-400">Sin detalles</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-
-                            <!-- PDF Totals -->
-                            <div class="flex justify-end">
-                                <div class="w-1/2 space-y-1.5 text-xs">
-                                    <div class="flex justify-between text-slate-600">
-                                        <span>Subtotal:</span>
-                                        <span id="pdf-subtotal" class="font-medium">$0.00</span>
-                                    </div>
-                                    <div class="flex justify-between text-slate-600">
-                                        <span>Impuestos (16% IVA):</span>
-                                        <span id="pdf-tax" class="font-medium">$0.00</span>
-                                    </div>
-                                    <div class="flex justify-between font-bold text-slate-900 text-sm border-t border-slate-300 pt-2">
-                                        <span>TOTAL A PAGAR:</span>
-                                        <span id="pdf-total" class="text-sky-700">$0.00</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Footer -->
-                            <div class="mt-12 pt-4 border-t border-slate-200 text-center text-[10px] text-slate-400">
-                                <p>Gracias por su compra. Esta factura es un comprobante válido emitido por nuestro sistema.</p>
-                                <p class="mt-0.5">Sincronizado vía Cloud Drive System</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </section>
-
-        <!-- MODULE 2: INVENTARIO -->
-        <section id="module-inventory" class="hidden space-y-6">
-            
-            <!-- Actions Toolbar -->
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-4">
-                <div class="relative w-full sm:w-80">
-                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
-                    <input type="text" id="inventory-search" oninput="filterInventory()" placeholder="Buscar por código o producto..." class="w-full pl-9 pr-4 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:outline-none">
-                </div>
-                <button onclick="openProductModal()" class="w-full sm:w-auto bg-sky-600 hover:bg-sky-700 text-white font-medium py-2 px-4 rounded-lg text-sm transition-colors flex items-center justify-center space-x-2 shadow-sm">
-                    <i class="fa-solid fa-plus"></i>
-                    <span>Nuevo Producto</span>
+        <!-- Top Header & BCV Rate Banner -->
+        <header class="bg-white border-b border-slate-200 px-4 sm:px-6 py-3 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-sm sticky top-0 z-10">
+            <div class="flex items-center justify-between w-full sm:w-auto gap-3">
+                <h2 id="header-title" class="text-lg sm:text-xl font-bold text-slate-900 truncate">Gestión de Inventario</h2>
+                <button onclick="openLoginModal()" class="md:hidden p-2 bg-slate-100 hover:bg-slate-200 rounded-xl text-slate-700" title="Cambiar Usuario">
+                    <i data-lucide="lock" class="w-4 h-4"></i>
                 </button>
             </div>
+            
+            <div class="flex items-center justify-between sm:justify-center gap-3 bg-indigo-50/70 border border-indigo-100 px-3.5 py-2 rounded-2xl w-full sm:w-auto">
+                <div class="flex items-center gap-2">
+                    <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                    <span class="text-xs font-bold text-indigo-900">BCV Automática:</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span id="bcv-rate-display" class="text-xs sm:text-sm font-black text-indigo-700">Cargando...</span>
+                    <button onclick="openBcvModal()" id="bcv-edit-btn" class="hidden text-indigo-600 hover:text-indigo-800 p-1 rounded-lg transition" title="Editar Tasa Manualmente">
+                        <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+                    </button>
+                </div>
+            </div>
 
-            <!-- Inventory Data Table -->
-            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="hidden md:flex items-center gap-3">
+                <span id="current-date" class="text-xs font-medium text-slate-500"></span>
+                <div class="h-6 w-px bg-slate-200"></div>
+                <div class="flex items-center gap-2">
+                    <div id="user-avatar" class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center font-bold justify-center text-xs">N</div>
+                    <span id="user-role-label" class="text-xs font-semibold text-slate-700">Nubea User</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- View 1: Inventory Tab -->
+        <div id="view-inventory" class="p-4 sm:p-6 space-y-6 flex-1">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
+                <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Total Productos</p>
+                        <h3 id="stat-total-products" class="text-xl sm:text-2xl font-bold text-slate-900 mt-1">0</h3>
+                    </div>
+                    <div class="bg-indigo-50 p-3 rounded-xl text-indigo-600">
+                        <i data-lucide="boxes" class="w-5 h-5 sm:w-6 sm:h-6"></i>
+                    </div>
+                </div>
+                <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Valor de Inventario</p>
+                        <h3 id="stat-total-value" class="text-lg sm:text-xl font-bold text-slate-900 mt-1">$0.00</h3>
+                        <p id="stat-total-value-bs" class="text-[11px] font-semibold text-slate-400">Bs. 0.00</p>
+                    </div>
+                    <div class="bg-emerald-50 p-3 rounded-xl text-emerald-600">
+                        <i data-lucide="dollar-sign" class="w-5 h-5 sm:w-6 sm:h-6"></i>
+                    </div>
+                </div>
+                <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Stock Bajo (&lt; 5)</p>
+                        <h3 id="stat-low-stock" class="text-xl sm:text-2xl font-bold text-amber-600 mt-1">0</h3>
+                    </div>
+                    <div class="bg-amber-50 p-3 rounded-xl text-amber-600">
+                        <i data-lucide="alert-triangle" class="w-5 h-5 sm:w-6 sm:h-6"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+                <div class="relative flex-1 w-full">
+                    <i data-lucide="search" class="absolute left-3.5 top-3 w-4 h-4 text-slate-400"></i>
+                    <input type="text" id="search-inventory" oninput="filterInventory()" placeholder="Buscar por nombre, SKU o familia..." class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
+                </div>
+                <div class="flex gap-2 shrink-0">
+                    <button onclick="openFamilyModal()" class="flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium px-4 py-2.5 rounded-xl transition-all text-sm">
+                        <i data-lucide="folder-plus" class="w-4 h-4"></i>
+                        Gestionar Familias
+                    </button>
+                    <button onclick="openProductModal()" class="flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-5 py-2.5 rounded-xl shadow-lg transition-all text-sm">
+                        <i data-lucide="plus" class="w-4 h-4"></i>
+                        Nuevo Producto
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm">
-                        <thead class="bg-slate-100 text-slate-600 text-xs uppercase font-medium">
-                            <tr>
-                                <th class="px-6 py-3">Código</th>
-                                <th class="px-6 py-3">Nombre del Producto</th>
-                                <th class="px-6 py-3 text-right">Precio Unitario</th>
-                                <th class="px-6 py-3 text-center">Stock</th>
-                                <th class="px-6 py-3 text-center">Estado</th>
-                                <th class="px-6 py-3 text-center">Acciones</th>
+                    <table class="w-full text-left border-collapse min-w-[750px]">
+                        <thead>
+                            <tr class="bg-slate-50/70 border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                                <th class="p-4">SKU / Familia</th>
+                                <th class="p-4">Producto</th>
+                                <th class="p-4">Costo / Margen</th>
+                                <th class="p-4">Precio Venta</th>
+                                <th class="p-4">Stock</th>
+                                <th class="p-4 text-right">Acciones</th>
                             </tr>
                         </thead>
-                        <tbody id="inventory-table-body" class="divide-y divide-slate-200">
-                            <!-- Items dinámicos -->
+                        <tbody id="inventory-table-body" class="divide-y divide-slate-100 text-sm">
                         </tbody>
                     </table>
                 </div>
-            </div>
-        </section>
-
-        <!-- MODULE 3: CONFIGURACIÓN NUBE (APPS SCRIPT / GOOGLE DRIVE) -->
-        <section id="module-cloud" class="hidden space-y-6">
-            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 max-w-3xl mx-auto">
-                <div class="flex items-center space-x-3 mb-4">
-                    <div class="bg-emerald-100 text-emerald-700 p-3 rounded-lg">
-                        <i class="fa-solid fa-cloud text-xl"></i>
+                <div id="empty-inventory" class="hidden p-12 text-center">
+                    <div class="w-12 h-12 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <i data-lucide="package-open" class="w-6 h-6"></i>
                     </div>
-                    <div>
-                        <h2 class="text-lg font-bold text-slate-800">Conexión con Google Sheets & Drive</h2>
-                        <p class="text-xs text-slate-500">Conecta este frontend local/web a tu servidor gratuito de Google</p>
-                    </div>
+                    <p class="text-slate-600 font-medium">No hay productos registrados</p>
                 </div>
+            </div>
+        </div>
 
-                <div class="space-y-4 text-sm text-slate-600">
-                    <p>Ingresa la URL de la **Web App** generada por Google Apps Script para habilitar la sincronización en tiempo real de tu inventario y facturas guardadas.</p>
+        <!-- View 1.5: Consultor de Precios Tab -->
+        <div id="view-checker" class="p-4 sm:p-6 space-y-6 flex-1 hidden">
+            <div class="max-w-2xl mx-auto space-y-6">
+                <div class="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm space-y-4 text-center">
+                    <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto">
+                        <i data-lucide="search" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900">Consultor Rápido de Precios</h3>
+                    <p class="text-xs text-slate-500 max-w-md mx-auto">Escribe el nombre o código SKU para consultar instantáneamente el precio en Dólares ($) y Bolívares (Bs.) según la tasa BCV del día.</p>
                     
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">URL de Google Apps Script Web App</label>
-                        <input type="url" id="cloud-script-url" placeholder="https://script.google.com/macros/s/.../exec" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:outline-none">
+                    <div class="relative text-left pt-2">
+                        <input type="text" id="checker-search-input" oninput="filterCheckerResults()" placeholder="Buscar producto por nombre, SKU o familia..." class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
+                    </div>
+                </div>
+
+                <div id="checker-results-container" class="space-y-3">
+                </div>
+            </div>
+        </div>
+
+        <!-- View 2: Invoicing Tab -->
+        <div id="view-invoice" class="p-4 sm:p-6 space-y-6 flex-1 hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-2 space-y-6">
+                    <div class="bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b pb-3">
+                            <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
+                                <i data-lucide="user" class="w-5 h-5 text-indigo-600"></i>
+                                Datos del Cliente y Factura
+                            </h3>
+                            <button onclick="openClientDirectoryModal('invoice')" class="flex items-center gap-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 px-3 py-1.5 rounded-xl text-xs font-semibold transition">
+                                <i data-lucide="users" class="w-4 h-4"></i> Directorio de Clientes
+                            </button>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Nombre del Cliente / Empresa</label>
+                                <input type="text" id="inv-client-name" placeholder="Ej. Juan Pérez" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Cédula / RIF / NIT</label>
+                                <input type="text" id="inv-client-doc" placeholder="Ej. V-12345678" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Correo Electrónico</label>
+                                <input type="email" id="inv-client-email" placeholder="cliente@correo.com" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Número de Factura</label>
+                                <input type="text" id="inv-number" readonly class="w-full px-3.5 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-sm font-bold text-indigo-600">
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="flex justify-end space-x-3 pt-2">
-                        <button onclick="testCloudConnection()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-lg text-sm font-medium transition-colors">
-                            Probar Conexión
-                        </button>
-                        <button onclick="saveCloudConfig()" class="bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
-                            Guardar Configuración
-                        </button>
-                    </div>
+                    <!-- Buscador Desplegable en Facturación -->
+                    <div class="bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                        <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
+                            <i data-lucide="shopping-cart" class="w-5 h-5 text-indigo-600"></i>
+                            Agregar Productos
+                        </h3>
+                        
+                        <div class="relative">
+                            <div class="flex gap-2">
+                                <div class="relative flex-1">
+                                    <input type="text" id="invoice-product-search" oninput="filterProductDropdown('invoice')" onfocus="openProductDropdown('invoice')" placeholder="🔍 Buscar producto por nombre o SKU..." class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
+                                    <input type="hidden" id="invoice-selected-product-id">
+                                </div>
+                                <input type="number" id="invoice-product-qty" value="1" min="1" class="w-20 px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-center focus:outline-none">
+                                <button onclick="addCartItem()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-5 py-2.5 rounded-xl shadow-lg transition-all text-sm flex items-center justify-center gap-2 shrink-0">
+                                    <i data-lucide="plus" class="w-4 h-4"></i> Añadir
+                                </button>
+                            </div>
+                            <!-- Menú Desplegable Flotante -->
+                            <div id="invoice-dropdown-list" class="absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl max-h-48 overflow-y-auto z-30 hidden divide-y">
+                            </div>
+                        </div>
 
-                    <div class="mt-6 p-4 bg-slate-50 rounded-lg border border-slate-200 text-xs space-y-2">
-                        <h4 class="font-bold text-slate-700"><i class="fa-solid fa-circle-info text-sky-500 mr-1"></i> Instrucciones rápidas de configuración:</h4>
-                        <ol class="list-decimal pl-4 space-y-1 text-slate-600">
-                            <li>Abre tu **Google Drive** y crea una **Google Sheet** vacía.</li>
-                            <li>En la hoja de cálculo, ve a **Extensiones > Apps Script**.</li>
-                            <li>Copia y pega el código backend proporcionado en la guía incluida de este proyecto.</li>
-                            <li>Haz clic en **Implementar > Nueva implementación**, elige **Aplicación Web**.</li>
-                            <li>En *Quién tiene acceso*, selecciona **Cualquier usuario (Anyone)**.</li>
-                            <li>Copia el enlace generado y pégalo arriba. ¡Listo!</li>
-                        </ol>
+                        <div class="overflow-x-auto border border-slate-200 rounded-xl mt-4">
+                            <table class="w-full text-left border-collapse min-w-[500px]">
+                                <thead>
+                                    <tr class="bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase">
+                                        <th class="p-3">SKU / Producto</th>
+                                        <th class="p-3 text-center">Cant</th>
+                                        <th class="p-3 text-right">Precio Unit.</th>
+                                        <th class="p-3 text-right">Subtotal</th>
+                                        <th class="p-3 text-center">Acción</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="cart-table-body" class="divide-y divide-slate-100 text-sm">
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="empty-cart" class="py-8 text-center text-slate-400 text-sm">
+                            No hay productos agregados a la factura actual.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-6">
+                    <div class="bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-sm space-y-5 sticky top-24">
+                        <h3 class="font-bold text-slate-900 text-base border-b border-slate-100 pb-3">Resumen de Factura</h3>
+                        <div class="space-y-3 text-sm">
+                            <div class="flex justify-between text-slate-600 items-start">
+                                <span>Subtotal</span>
+                                <div class="text-right">
+                                    <div id="summary-subtotal" class="font-semibold text-slate-900">$0.00</div>
+                                    <div id="summary-subtotal-bs" class="text-xs text-slate-400">Bs. 0.00</div>
+                                </div>
+                            </div>
+                            <div class="flex justify-between text-slate-600 items-center">
+                                <span>Impuesto (IVA <input type="number" id="tax-rate" value="16" oninput="calculateTotals()" class="w-12 text-center bg-slate-50 border border-slate-200 rounded p-0.5 text-xs font-bold inline-block mx-1">%)</span>
+                                <div class="text-right">
+                                    <div id="summary-tax" class="font-semibold text-slate-900">$0.00</div>
+                                    <div id="summary-tax-bs" class="text-xs text-slate-400">Bs. 0.00</div>
+                                </div>
+                            </div>
+                            <div class="border-t border-slate-200 pt-3 flex justify-between text-base font-bold text-slate-900 items-start">
+                                <span>Total a Pagar</span>
+                                <div class="text-right">
+                                    <div id="summary-total" class="text-indigo-600 text-lg">$0.00</div>
+                                    <div id="summary-total-bs" class="text-xs font-bold text-slate-500">Bs. 0.00</div>
+                                </div>
+                            </div>
+                        </div>
+                        <button onclick="generatePDF()" class="w-full flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 rounded-xl shadow-lg transition-all text-sm">
+                            <i data-lucide="file-down" class="w-5 h-5"></i>
+                            Generar Factura PDF
+                        </button>
+                        <button onclick="clearInvoiceForm()" class="w-full flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-2.5 rounded-xl transition-all text-sm">
+                            <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                            Limpiar Formulario
+                        </button>
                     </div>
                 </div>
             </div>
-        </section>
+        </div>
+
+        <!-- View 3: Cotizaciones Tab -->
+        <div id="view-quote" class="p-4 sm:p-6 space-y-6 flex-1 hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-2 space-y-6">
+                    <div class="bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b pb-3">
+                            <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
+                                <i data-lucide="calculator" class="w-5 h-5 text-indigo-600"></i>
+                                Emitir Nueva Cotización / Presupuesto
+                            </h3>
+                            <button onclick="openClientDirectoryModal('quote')" class="flex items-center gap-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 px-3 py-1.5 rounded-xl text-xs font-semibold transition">
+                                <i data-lucide="users" class="w-4 h-4"></i> Seleccionar Cliente
+                            </button>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Nombre del Cliente / Empresa</label>
+                                <input type="text" id="quote-client-name" placeholder="Ej. Cliente Solicitante" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Cédula / RIF / NIT</label>
+                                <input type="text" id="quote-client-doc" placeholder="Ej. V-12345678" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Correo Electrónico</label>
+                                <input type="email" id="quote-client-email" placeholder="cliente@correo.com" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Nº Cotización</label>
+                                <input type="text" id="quote-number" readonly class="w-full px-3.5 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-sm font-bold text-indigo-600">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Buscador Desplegable en Cotizaciones -->
+                    <div class="bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                        <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
+                            <i data-lucide="boxes" class="w-5 h-5 text-indigo-600"></i>
+                            Agregar Productos
+                        </h3>
+                        
+                        <div class="relative">
+                            <div class="flex gap-2">
+                                <div class="relative flex-1">
+                                    <input type="text" id="quote-product-search" oninput="filterProductDropdown('quote')" onfocus="openProductDropdown('quote')" placeholder="🔍 Buscar producto por nombre o SKU..." class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
+                                    <input type="hidden" id="quote-selected-product-id">
+                                </div>
+                                <input type="number" id="quote-product-qty" value="1" min="1" class="w-20 px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-center focus:outline-none">
+                                <button onclick="addQuoteCartItem()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-5 py-2.5 rounded-xl shadow-lg transition-all text-sm flex items-center justify-center gap-2 shrink-0">
+                                    <i data-lucide="plus" class="w-4 h-4"></i> Añadir
+                                </button>
+                            </div>
+                            <!-- Menú Desplegable Flotante -->
+                            <div id="quote-dropdown-list" class="absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl max-h-48 overflow-y-auto z-30 hidden divide-y">
+                            </div>
+                        </div>
+
+                        <div class="overflow-x-auto border border-slate-200 rounded-xl mt-4">
+                            <table class="w-full text-left border-collapse min-w-[500px]">
+                                <thead>
+                                    <tr class="bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase">
+                                        <th class="p-3">SKU / Producto</th>
+                                        <th class="p-3 text-center">Cant</th>
+                                        <th class="p-3 text-right">Precio Unit.</th>
+                                        <th class="p-3 text-right">Subtotal</th>
+                                        <th class="p-3 text-center">Acción</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="quote-cart-table-body" class="divide-y divide-slate-100 text-sm">
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="empty-quote-cart" class="py-8 text-center text-slate-400 text-sm">
+                            No hay productos agregados a esta cotización.
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                        <div class="flex justify-between items-center border-b pb-3">
+                            <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
+                                <i data-lucide="file-text" class="w-5 h-5 text-indigo-600"></i>
+                                Historial de Cotizaciones Emitidas
+                            </h3>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse min-w-[550px]">
+                                <thead>
+                                    <tr class="bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase">
+                                        <th class="p-3">Nº Cotización</th>
+                                        <th class="p-3">Fecha</th>
+                                        <th class="p-3">Cliente</th>
+                                        <th class="p-3 text-right">Total</th>
+                                        <th class="p-3 text-center">Estado</th>
+                                        <th class="p-3 text-right">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="quotes-history-table-body" class="divide-y divide-slate-100 text-sm">
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="empty-quotes-history" class="hidden py-6 text-center text-slate-400 text-xs">
+                            No hay cotizaciones registradas todavía.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-6">
+                    <div class="bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-sm space-y-5 sticky top-24">
+                        <h3 class="font-bold text-slate-900 text-base border-b border-slate-100 pb-3">Resumen de Cotización</h3>
+                        <div class="space-y-3 text-sm">
+                            <div class="flex justify-between text-slate-600 items-start">
+                                <span>Subtotal</span>
+                                <div class="text-right">
+                                    <div id="quote-summary-subtotal" class="font-semibold text-slate-900">$0.00</div>
+                                    <div id="quote-summary-subtotal-bs" class="text-xs text-slate-400">Bs. 0.00</div>
+                                </div>
+                            </div>
+                            <div class="flex justify-between text-slate-600 items-center">
+                                <span>IVA (<input type="number" id="quote-tax-rate" value="16" oninput="calculateQuoteTotals()" class="w-12 text-center bg-slate-50 border border-slate-200 rounded p-0.5 text-xs font-bold inline-block mx-1">%)</span>
+                                <div class="text-right">
+                                    <div id="quote-summary-tax" class="font-semibold text-slate-900">$0.00</div>
+                                    <div id="quote-summary-tax-bs" class="text-xs text-slate-400">Bs. 0.00</div>
+                                </div>
+                            </div>
+                            <div class="border-t border-slate-200 pt-3 flex justify-between text-base font-bold text-slate-900 items-start">
+                                <span>Total Estimado</span>
+                                <div class="text-right">
+                                    <div id="quote-summary-total" class="text-indigo-600 text-lg">$0.00</div>
+                                    <div id="quote-summary-total-bs" class="text-xs font-bold text-slate-500">Bs. 0.00</div>
+                                </div>
+                            </div>
+                        </div>
+                        <button onclick="generateQuotePDF()" class="w-full flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 rounded-xl shadow-lg transition-all text-sm">
+                            <i data-lucide="file-down" class="w-5 h-5"></i>
+                            Emitir e Imprimir PDF
+                        </button>
+                        <button onclick="clearQuoteForm()" class="w-full flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-2.5 rounded-xl transition-all text-sm">
+                            <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                            Limpiar Formulario
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- View 4: Invoices History & Returns -->
+        <div id="view-history" class="p-4 sm:p-6 space-y-6 flex-1 hidden">
+            <div class="bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b pb-4">
+                    <div>
+                        <h3 class="font-bold text-slate-900 text-base sm:text-lg">Historial de Facturas Emitidas</h3>
+                        <p class="text-xs text-slate-500">Consulta tus facturas emitidas, descarga de nuevo el PDF o procesa devoluciones.</p>
+                    </div>
+                    <div class="relative w-full sm:w-64">
+                        <i data-lucide="search" class="absolute left-3 top-2.5 w-4 h-4 text-slate-400"></i>
+                        <input type="text" id="search-history" oninput="renderHistory()" placeholder="Buscar factura..." class="w-full pl-9 pr-4 py-2 bg-slate-50 border rounded-xl text-xs focus:outline-none">
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse min-w-[600px]">
+                        <thead>
+                            <tr class="bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase">
+                                <th class="p-4">Nº Factura</th>
+                                <th class="p-4">Fecha</th>
+                                <th class="p-4">Cliente</th>
+                                <th class="p-4">Total</th>
+                                <th class="p-4">Estado</th>
+                                <th class="p-4 text-right">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-table-body" class="divide-y divide-slate-100 text-sm">
+                        </tbody>
+                    </table>
+                </div>
+                <div id="empty-history" class="hidden p-12 text-center text-slate-400">
+                    <p class="font-medium">No hay facturas emitidas todavía.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- View 5: Google Drive Config (Solo Admin) -->
+        <div id="view-cloud" class="p-4 sm:p-6 space-y-6 flex-1 hidden">
+            <div class="max-w-4xl mx-auto space-y-6">
+                <div class="bg-gradient-to-r from-indigo-900 to-slate-900 text-white p-6 sm:p-8 rounded-3xl shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
+                    <div class="space-y-2 text-center md:text-left">
+                        <span class="px-3 py-1 bg-indigo-500/30 text-indigo-300 rounded-full text-xs font-semibold uppercase tracking-wider">Cloud 100% Gratis</span>
+                        <h2 class="text-xl sm:text-2xl font-bold">Conexión con Google Drive y Sheets</h2>
+                        <p class="text-slate-300 text-sm max-w-xl">Tu sistema está vinculado de forma directa con Google Apps Script.</p>
+                    </div>
+                    <div class="bg-white/10 p-4 rounded-2xl backdrop-blur-sm border border-white/10 text-center shrink-0">
+                        <i data-lucide="cloud-cog" class="w-12 h-12 text-indigo-400 mx-auto mb-2"></i>
+                        <span class="text-xs font-semibold text-emerald-300">Conectado a la Nube</span>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm space-y-6">
+                    <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                        <i data-lucide="book-open" class="w-5 h-5 text-indigo-600"></i>
+                        Configuración de Webhook (Apps Script)
+                    </h3>
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <input type="text" id="cloud-webhook-url" class="flex-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-mono text-slate-600 focus:outline-none" readonly>
+                        <button onclick="saveCloudUrl()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-5 py-2.5 rounded-xl shadow-lg transition-all text-sm shrink-0">Actualizar URL</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
     </main>
 
-    <!-- Modal Form for Product (Create/Edit) -->
-    <div id="product-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50 hidden">
-        <div class="bg-white rounded-xl shadow-xl border border-slate-200 w-full max-w-md p-6 space-y-4 m-4">
-            <div class="flex justify-between items-center border-b border-slate-200 pb-3">
-                <h3 id="modal-title" class="font-bold text-slate-800 text-base">Nuevo Producto</h3>
-                <button onclick="closeProductModal()" class="text-slate-400 hover:text-slate-600">
-                    <i class="fa-solid fa-xmark text-lg"></i>
+    <!-- Modal: Gestión de Familias -->
+    <div id="family-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4 border border-slate-100">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
+                    <i data-lucide="folder-plus" class="w-5 h-5 text-indigo-600"></i> Gestionar Familias / Categorías
+                </h3>
+                <button onclick="closeFamilyModal()" class="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400">
+                    <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
             </div>
             
-            <form id="product-form" onsubmit="handleProductSubmit(event)" class="space-y-3">
-                <input type="hidden" id="edit-index" value="-1">
-                <div>
-                    <label class="block text-xs font-medium text-slate-600 mb-1">Código del Producto *</label>
-                    <input type="text" id="prod-code" required placeholder="Ej. PROD-001" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-slate-600 mb-1">Nombre o Descripción *</label>
-                    <input type="text" id="prod-name" required placeholder="Ej. Laptop Dell XPS 13" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:outline-none">
-                </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-medium text-slate-600 mb-1">Precio ($) *</label>
-                        <input type="number" step="0.01" min="0" id="prod-price" required placeholder="0.00" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:outline-none">
+            <form onsubmit="addNewFamily(event)" class="space-y-3">
+                <div class="grid grid-cols-3 gap-2">
+                    <div class="col-span-2">
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Nombre de la Familia</label>
+                        <input type="text" id="new-family-name" required placeholder="Ej. Iluminación" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none">
                     </div>
                     <div>
-                        <label class="block text-xs font-medium text-slate-600 mb-1">Stock Inicial *</label>
-                        <input type="number" min="0" id="prod-stock" required placeholder="0" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:outline-none">
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Prefijo (3-4 letras)</label>
+                        <input type="text" id="new-family-code" required placeholder="ILU" maxlength="4" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs uppercase font-mono focus:outline-none">
+                    </div>
+                </div>
+                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl shadow transition text-xs">Agregar Familia</button>
+            </form>
+
+            <div class="border-t pt-3">
+                <p class="text-xs font-semibold text-slate-500 mb-2">Familias Registradas:</p>
+                <div class="max-h-40 overflow-y-auto space-y-1.5 divide-y" id="family-list-container">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Ajuste Rápido de Inventario -->
+    <div id="stock-adjust-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl max-w-xs w-full p-6 shadow-2xl space-y-4 border border-slate-100">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <h3 class="font-bold text-slate-900 text-base">Ajustar Stock</h3>
+                <button onclick="closeStockModal()" class="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <input type="hidden" id="adjust-prod-id">
+            <div>
+                <p id="adjust-prod-name" class="text-xs font-semibold text-slate-500 mb-2 truncate"></p>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Cantidad a sumar (+) o restar (-):</label>
+                <input type="number" id="adjust-qty-input" value="1" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-center focus:outline-none">
+            </div>
+            <button onclick="confirmStockAdjustment()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl shadow-lg transition text-sm">Aplicar Ajuste</button>
+        </div>
+    </div>
+
+    <!-- Modal: Modificar Tasa BCV Manualmente (Admin) -->
+    <div id="bcv-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl space-y-5 border border-slate-100">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
+                    <i data-lucide="dollar-sign" class="w-5 h-5 text-indigo-600"></i> Ajustar Tasa BCV Manual
+                </h3>
+                <button onclick="closeBcvModal()" class="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Tasa Oficial (Bs / 1 USD):</label>
+                    <input type="number" step="0.01" id="bcv-rate-input" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
+                </div>
+                <button onclick="saveBcvRate()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl shadow-lg transition text-sm">Guardar Tasa Manual</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Inicio de Sesión / Selección de Usuario -->
+    <div id="login-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl space-y-5 border border-slate-100">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <h3 class="font-bold text-slate-900 text-lg flex items-center gap-2">
+                    <i data-lucide="lock" class="w-5 h-5 text-indigo-600"></i> Iniciar Sesión Nubea
+                </h3>
+                <button onclick="closeLoginModal()" class="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Ingresa tu Contraseña:</label>
+                    <input type="password" id="login-password-input" placeholder="••••••••" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
+                </div>
+                <button onclick="verifyLogin()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl shadow-lg transition text-sm">Acceder al Sistema</button>
+            </div>
+            <div class="text-[11px] text-slate-400 text-center space-y-1 bg-slate-50 p-3 rounded-xl border">
+                <p><b>Claves de Acceso:</b></p>
+                <p>• Admin: <code class="text-indigo-600 font-semibold">admin2026</code></p>
+                <p>• Suministros Eléctricos Ariza: <code class="text-indigo-600 font-semibold">ariza123</code></p>
+                <p>• Los Llanos Lubricantes: <code class="text-indigo-600 font-semibold">llanos123</code></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Directorio de Clientes -->
+    <div id="client-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-5 border border-slate-100">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <h3 class="font-bold text-slate-900 text-lg flex items-center gap-2">
+                    <i data-lucide="users" class="w-5 h-5 text-indigo-600"></i> Directorio de Clientes
+                </h3>
+                <button onclick="closeClientDirectoryModal()" class="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            
+            <div class="relative">
+                <i data-lucide="search" class="absolute left-3.5 top-3 w-4 h-4 text-slate-400"></i>
+                <input type="text" id="search-client-dir" oninput="filterClientDirectory()" placeholder="Buscar por nombre, cédula o RIF..." class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none">
+            </div>
+
+            <div class="max-h-64 overflow-y-auto border rounded-xl divide-y" id="client-directory-list"></div>
+        </div>
+    </div>
+
+    <!-- Product Modal (Add / Edit) -->
+    <div id="product-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4 border border-slate-100">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <h3 id="modal-title" class="font-bold text-slate-900 text-lg">Nuevo Producto</h3>
+                <button onclick="closeProductModal()" class="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            
+            <form id="product-form" onsubmit="saveProduct(event)" class="space-y-3">
+                <input type="hidden" id="product-id">
+                
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Familia / Categoría</label>
+                    <select id="prod-family" onchange="onFamilyChange()" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none font-medium">
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">SKU / Código Automático</label>
+                    <input type="text" id="prod-sku" readonly class="w-full px-3.5 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-sm font-mono font-bold text-indigo-600">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Nombre del Producto</label>
+                    <input type="text" id="prod-name" required placeholder="Ej. TRANSFORMADOR MONOFASICO" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Precio de Costo ($)</label>
+                        <input type="number" step="0.01" id="prod-cost" oninput="calculateModalPrice()" required placeholder="0.00" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">% de Ganancia</label>
+                        <input type="number" step="0.01" id="prod-margin" oninput="calculateModalPrice()" required value="30" placeholder="30" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none">
                     </div>
                 </div>
 
-                <div class="flex justify-end space-x-2 pt-4">
-                    <button type="button" onclick="closeProductModal()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-lg text-sm font-medium transition-colors">Cancelar</button>
-                    <button type="submit" class="bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">Guardar Producto</button>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Precio de Venta Calculado ($)</label>
+                    <input type="text" id="prod-calc-price-display" readonly class="w-full px-3.5 py-2.5 bg-emerald-50 border border-emerald-200 rounded-xl text-sm font-bold text-emerald-700" value="$0.00">
+                    <input type="hidden" id="prod-price">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Stock Inicial</label>
+                    <input type="number" id="prod-stock" required placeholder="0" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none">
+                </div>
+
+                <div class="flex justify-end gap-3 pt-3">
+                    <button type="button" onclick="closeProductModal()" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-xl text-sm transition-all">Cancelar</button>
+                    <button type="submit" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-xl text-sm shadow-lg transition-all">Guardar Producto</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Notification Toast -->
-    <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center space-x-3 transition-all duration-300 translate-y-20 opacity-0 z-50">
-        <i id="toast-icon" class="fa-solid fa-circle-check text-emerald-400"></i>
-        <span id="toast-message" class="text-xs font-medium">Mensaje de notificación</span>
-    </div>
-
-    <!-- JavaScript Application Logic -->
+    <!-- Application Script Logic -->
     <script>
-        // State Management
-        let inventory = JSON.parse(localStorage.getItem('app_inventory')) || [
-            { code: 'P001', name: 'Teclado Mecánico RGB', price: 45.00, stock: 15 },
-            { code: 'P002', name: 'Mouse Inalámbrico Pro', price: 25.50, stock: 8 },
-            { code: 'P003', name: 'Monitor 24" Full HD', price: 180.00, stock: 4 },
-            { code: 'P004', name: 'Audífonos Gaming 7.1', price: 60.00, stock: 2 }
-        ];
-
-        let currentInvoiceItems = [];
-        let invoiceCounter = parseInt(localStorage.getItem('app_invoice_counter')) || 1;
-        let cloudScriptUrl = localStorage.getItem('app_cloud_url') || '';
-
-        // Initialize App
-        window.onload = function() {
-            saveInventoryToStorage();
-            renderInventoryTable();
-            populateProductSelect();
-            updateInvoiceDate();
-            updatePdfHeaderNumber();
-
-            // Auto-fill cloud URL if saved
-            if (cloudScriptUrl) {
-                document.getElementById('cloud-script-url').value = cloudScriptUrl;
-                updateSyncStatus('Conectado a Apps Script', true);
+        const USERS_DB = {
+            "admin2026": {
+                role: "admin",
+                idKey: "admin",
+                name: "Administrador General",
+                businessName: "NUBEA - ADMINISTRACIÓN CENTRAL",
+                rif: "J-00000000-0",
+                address: "Acarigua, Estado Portuguesa",
+                phone: "+58 412-0000000"
+            },
+            "ariza123": {
+                role: "client",
+                idKey: "ariza",
+                name: "Suministros Eléctricos Ariza",
+                businessName: "SUMINISTROS ELECTRICOS ARIZA",
+                rif: "J-31234567-8",
+                address: "Av. Circunvalación Sur, Acarigua, Portuguesa",
+                phone: "+58 412-1234567"
+            },
+            "llanos123": {
+                role: "client",
+                idKey: "llanos",
+                name: "Los Llanos Lubricantes",
+                businessName: "LOS LLANOS LUBRICANTES Y ACCESORIOS",
+                rif: "J-40123456-9",
+                address: "Avenida Principal Las Acacias, Acarigua",
+                phone: "+58 414-7654321"
             }
-
-            // Sync Customer Data Inputs with PDF Live Preview
-            setupCustomerLivePreview();
         };
 
-        // Tab Switching Logic
-        function switchTab(tab) {
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('border-sky-600', 'text-sky-600');
-                btn.classList.add('border-transparent', 'text-slate-500');
+        let currentUser = JSON.parse(localStorage.getItem('si_current_user')) || USERS_DB["ariza123"];
+        let bcvRate = parseFloat(localStorage.getItem('si_bcv_rate')) || 893.22;
+
+        const DEFAULT_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzGKXU72cclZhFT8e8R1LZtw54Vpmvor03rqEW1D0nMa5JNvU3f0l_7HMm-HTdbo7vs/exec";
+        let cloudWebhook = localStorage.getItem('si_cloud_url') || DEFAULT_APPS_SCRIPT_URL;
+
+        // Gestión de Familias Dinámicas por el Cliente
+        let families = JSON.parse(localStorage.getItem('si_families')) || [
+            { code: 'ELE', name: 'Suministros Eléctricos' },
+            { code: 'LUB', name: 'Lubricantes y Fluidos' },
+            { code: 'CAB', name: 'Cables y Conductores' },
+            { code: 'HER', name: 'Herramientas y Ferretería' },
+            { code: 'GEN', name: 'General / Varios' }
+        ];
+
+        let inventory = JSON.parse(localStorage.getItem('si_inventory')) || [
+            { id: '1', family: 'ELE', sku: 'ELE-001', name: 'TRANSFORMADOR MONOFASICO 15 KVA', cost: 650.00, margin: 30, price: 850.00, stock: 12 },
+            { id: '2', family: 'CAB', sku: 'CAB-001', name: 'CABLE UTP CAT6 BOBINA X 305M', cost: 35.00, margin: 28.5, price: 45.00, stock: 20 }
+        ];
+
+        let invoices = JSON.parse(localStorage.getItem('si_invoices')) || [];
+        let quotes = JSON.parse(localStorage.getItem('si_quotes')) || [];
+        let clients = JSON.parse(localStorage.getItem('si_clients')) || [];
+        let currentCart = [];
+        let currentQuoteCart = [];
+        let targetDirectoryContext = 'invoice';
+
+        window.onload = function() {
+            lucide.createIcons();
+            updateDate();
+            fetchAutomaticBcvRate();
+            populateFamilySelects();
+            renderInventory();
+            updateInventoryStats();
+            initInvoiceNumber();
+            initQuoteNumber();
+            renderCheckerResults();
+            renderHistory();
+            renderQuotesHistory();
+            updateAuthUI();
+            document.getElementById('cloud-webhook-url').value = cloudWebhook;
+
+            document.addEventListener('click', function(e) {
+                if(!e.target.closest('#invoice-product-search') && !e.target.closest('#invoice-dropdown-list')) {
+                    document.getElementById('invoice-dropdown-list').classList.add('hidden');
+                }
+                if(!e.target.closest('#quote-product-search') && !e.target.closest('#quote-dropdown-list')) {
+                    document.getElementById('quote-dropdown-list').classList.add('hidden');
+                }
             });
+        };
 
-            document.getElementById(`module-billing`).classList.add('hidden');
-            document.getElementById(`module-inventory`).classList.add('hidden');
-            document.getElementById(`module-cloud`).classList.add('hidden');
-
-            document.getElementById(`tab-${tab}-btn`).classList.add('border-sky-600', 'text-sky-600');
-            document.getElementById(`tab-${tab}-btn`).classList.remove('border-transparent', 'text-slate-500');
-            document.getElementById(`module-${tab}`).classList.remove('hidden');
+        function fetchAutomaticBcvRate() {
+            document.getElementById('bcv-rate-display').innerText = `Bs. ${bcvRate.toFixed(2)} (Sincronizando...)`;
+            fetch('https://ve.dolarapi.com/v1/dolares/bcv')
+                .then(response => response.json())
+                .then(data => {
+                    if (data && data.promedio) {
+                        bcvRate = data.promedio;
+                    } else if (data && data.precio) {
+                        bcvRate = data.precio;
+                    }
+                    localStorage.setItem('si_bcv_rate', bcvRate);
+                    updateBcvDisplay();
+                    renderInventory();
+                    updateInventoryStats();
+                    renderCart();
+                    renderQuoteCart();
+                    renderCheckerResults();
+                })
+                .catch(err => {
+                    console.warn("Usando tasa respaldo guardada:", err);
+                    updateBcvDisplay();
+                });
         }
 
-        // --- INVENTORY MANAGEMENT ---
-        function saveInventoryToStorage() {
-            localStorage.setItem('app_inventory', JSON.stringify(inventory));
-            document.getElementById('inventory-badge').textContent = inventory.length;
+        function updateDate() {
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const dateElem = document.getElementById('current-date');
+            if(dateElem) dateElem.innerText = new Date().toLocaleDateString('es-ES', options);
         }
 
-        function renderInventoryTable(items = inventory) {
-            const tbody = document.getElementById('inventory-table-body');
-            tbody.innerHTML = '';
+        function updateBcvDisplay() {
+            const display = document.getElementById('bcv-rate-display');
+            if(display) display.innerText = `Bs. ${bcvRate.toFixed(2)}`;
+        }
 
-            if (items.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-slate-400">No se encontraron productos.</td></tr>`;
+        function openBcvModal() {
+            document.getElementById('bcv-rate-input').value = bcvRate;
+            document.getElementById('bcv-modal').classList.remove('hidden');
+        }
+
+        function closeBcvModal() {
+            document.getElementById('bcv-modal').classList.add('hidden');
+        }
+
+        function saveBcvRate() {
+            const val = parseFloat(document.getElementById('bcv-rate-input').value);
+            if (!val || val <= 0) return showToast('Ingresa una tasa válida', 'error');
+            bcvRate = val;
+            localStorage.setItem('si_bcv_rate', bcvRate);
+            updateBcvDisplay();
+            closeBcvModal();
+            renderInventory();
+            updateInventoryStats();
+            renderCart();
+            renderQuoteCart();
+            renderCheckerResults();
+            showToast('Tasa BCV actualizada manualmente');
+        }
+
+        function openLoginModal() {
+            document.getElementById('login-modal').classList.remove('hidden');
+        }
+
+        function closeLoginModal() {
+            document.getElementById('login-modal').classList.add('hidden');
+        }
+
+        function verifyLogin() {
+            const pass = document.getElementById('login-password-input').value.trim();
+            if (USERS_DB[pass]) {
+                currentUser = USERS_DB[pass];
+                localStorage.setItem('si_current_user', JSON.stringify(currentUser));
+                closeLoginModal();
+                updateAuthUI();
+                switchTab('inventory');
+                showToast(`Sesión activa: ${currentUser.name}`);
+            } else {
+                showToast('Contraseña incorrecta', 'error');
+            }
+            document.getElementById('login-password-input').value = '';
+        }
+
+        function updateAuthUI() {
+            const badge = document.getElementById('auth-status-badge');
+            const avatar = document.getElementById('user-avatar');
+            const roleLabel = document.getElementById('user-role-label');
+            const navCloud = document.getElementById('nav-cloud');
+            const navQuote = document.getElementById('nav-quote');
+            const bcvEditBtn = document.getElementById('bcv-edit-btn');
+            const sidebarBusiness = document.getElementById('sidebar-business-name');
+            const sidebarRole = document.getElementById('sidebar-role-desc');
+
+            sidebarBusiness.innerText = currentUser.businessName.length > 22 ? currentUser.businessName.substring(0, 20) + '...' : currentUser.businessName;
+            sidebarRole.innerText = currentUser.role === 'admin' ? 'Administrador Nubea' : 'Cliente Autorizado';
+
+            if (currentUser.idKey === 'ariza') {
+                if(navQuote) {
+                    navQuote.classList.remove('flex');
+                    navQuote.classList.add('hidden');
+                }
+            } else {
+                if(navQuote) {
+                    navQuote.classList.remove('hidden');
+                    navQuote.classList.add('flex');
+                }
+            }
+
+            if (currentUser.role === 'admin') {
+                badge.innerText = 'Admin';
+                badge.className = "px-2 py-0.5 rounded-full text-[10px] bg-emerald-500/20 text-emerald-400 font-medium";
+                avatar.className = "w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 flex items-center font-bold justify-center text-xs";
+                avatar.innerText = "AD";
+                roleLabel.innerText = "Administrador";
+                if(navCloud) { navCloud.classList.remove('hidden'); navCloud.classList.add('flex'); }
+                if(bcvEditBtn) bcvEditBtn.classList.remove('hidden');
+            } else {
+                badge.innerText = 'Cliente';
+                badge.className = "px-2 py-0.5 rounded-full text-[10px] bg-indigo-500/20 text-indigo-300 font-medium";
+                avatar.className = "w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center font-bold justify-center text-xs";
+                avatar.innerText = currentUser.name.substring(0,2).toUpperCase();
+                roleLabel.innerText = currentUser.name;
+                if(navCloud) { navCloud.classList.remove('flex'); navCloud.classList.add('hidden'); }
+                if(bcvEditBtn) bcvEditBtn.classList.add('hidden');
+            }
+        }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `flex items-center gap-3 px-4 py-3 rounded-2xl shadow-xl text-white text-sm font-medium transition-all transform translate-y-2 opacity-0 ${type === 'success' ? 'bg-emerald-600' : 'bg-rose-600'}`;
+            toast.innerHTML = `<i data-lucide="${type === 'success' ? 'check-circle' : 'alert-circle'}" class="w-5 h-5 shrink-0"></i><span>${message}</span>`;
+            container.appendChild(toast);
+            lucide.createIcons();
+
+            setTimeout(() => { toast.classList.remove('translate-y-2', 'opacity-0'); }, 10);
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function switchTab(tab) {
+            if (tab === 'quote' && currentUser.idKey === 'ariza') {
+                showToast('Acceso no autorizado para Suministros Eléctricos Ariza', 'error');
                 return;
             }
 
-            items.forEach((item, index) => {
-                const isLowStock = item.stock <= 3;
-                const statusBadge = item.stock > 0 
-                    ? `<span class="bg-emerald-100 text-emerald-800 text-[10px] font-semibold px-2 py-0.5 rounded-full">Disponible (${item.stock})</span>`
-                    : `<span class="bg-red-100 text-red-800 text-[10px] font-semibold px-2 py-0.5 rounded-full">Agotado</span>`;
+            const tabs = ['inventory', 'checker', 'invoice', 'quote', 'history'];
+            if (currentUser.role === 'admin') tabs.push('cloud');
 
-                tbody.innerHTML += `
-                    <tr class="hover:bg-slate-50 transition-colors">
-                        <td class="px-6 py-3 font-medium text-slate-900">${item.code}</td>
-                        <td class="px-6 py-3">${item.name}</td>
-                        <td class="px-6 py-3 text-right font-medium">$${item.price.toFixed(2)}</td>
-                        <td class="px-6 py-3 text-center ${isLowStock ? 'text-amber-600 font-bold' : ''}">${item.stock}</td>
-                        <td class="px-6 py-3 text-center">${statusBadge}</td>
-                        <td class="px-6 py-3 text-center space-x-2">
-                            <button onclick="editProduct(${index})" class="text-sky-600 hover:text-sky-800 p-1"><i class="fa-solid fa-pen"></i></button>
-                            <button onclick="deleteProduct(${index})" class="text-red-500 hover:text-red-700 p-1"><i class="fa-solid fa-trash"></i></button>
-                        </td>
-                    </tr>
+            tabs.forEach(t => {
+                const viewElem = document.getElementById(`view-${t}`);
+                const navElem = document.getElementById(`nav-${t}`);
+                if(viewElem) viewElem.classList.add('hidden');
+                if(navElem) navElem.className = "flex-1 md:flex-none flex items-center justify-center md:justify-start gap-3 px-3 md:px-4 py-2.5 md:py-3 rounded-xl font-medium transition-all text-left text-slate-400 hover:bg-slate-800 hover:text-white text-xs md:text-sm whitespace-nowrap";
+            });
+
+            document.getElementById(`view-${tab}`).classList.remove('hidden');
+            document.getElementById(`nav-${tab}`).className = "flex-1 md:flex-none flex items-center justify-center md:justify-start gap-3 px-3 md:px-4 py-2.5 md:py-3 rounded-xl font-medium transition-all text-left bg-indigo-600 text-white shadow-lg shadow-indigo-600/20 text-xs md:text-sm whitespace-nowrap";
+            
+            const titles = {
+                inventory: 'Gestión de Inventario',
+                checker: 'Consultor de Precios en Vivo',
+                invoice: 'Módulo de Facturación',
+                quote: 'Módulo de Cotizaciones y Presupuestos',
+                history: 'Historial de Facturas y Devoluciones',
+                cloud: 'Guía y Configuración Google Drive'
+            };
+            document.getElementById('header-title').innerText = titles[tab];
+        }
+
+        // --- Gestión de Familias por el Cliente ---
+        function openFamilyModal() {
+            renderFamilyList();
+            document.getElementById('family-modal').classList.remove('hidden');
+        }
+
+        function closeFamilyModal() {
+            document.getElementById('family-modal').classList.add('hidden');
+        }
+
+        function renderFamilyList() {
+            const container = document.getElementById('family-list-container');
+            container.innerHTML = '';
+            families.forEach((fam, index) => {
+                const div = document.createElement('div');
+                div.className = "py-2 flex items-center justify-between text-xs";
+                div.innerHTML = `
+                    <div>
+                        <span class="font-mono font-bold text-indigo-600">[${fam.code}]</span> 
+                        <span class="font-semibold text-slate-800 ml-1">${fam.name}</span>
+                    </div>
+                    <button onclick="deleteFamily(${index})" class="text-rose-500 hover:text-rose-700 p-1" title="Eliminar Familia">
+                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                    </button>
                 `;
+                container.appendChild(div);
+            });
+            lucide.createIcons();
+        }
+
+        function addNewFamily(e) {
+            e.preventDefault();
+            const name = document.getElementById('new-family-name').value.trim();
+            const code = document.getElementById('new-family-code').value.trim().toUpperCase();
+
+            if (!name || !code) return;
+            if (families.some(f => f.code === code)) {
+                return showToast('Ya existe una familia con ese código prefijo', 'error');
+            }
+
+            families.push({ code, name });
+            localStorage.setItem('si_families', JSON.stringify(families));
+            populateFamilySelects();
+            renderFamilyList();
+            document.getElementById('new-family-name').value = '';
+            document.getElementById('new-family-code').value = '';
+            showToast('Familia creada correctamente');
+        }
+
+        function deleteFamily(index) {
+            if (families.length <= 1) return showToast('Debe existir al menos una familia', 'error');
+            families.splice(index, 1);
+            localStorage.setItem('si_families', JSON.stringify(families));
+            populateFamilySelects();
+            renderFamilyList();
+            showToast('Familia eliminada');
+        }
+
+        function populateFamilySelects() {
+            const select = document.getElementById('prod-family');
+            if(!select) return;
+            select.innerHTML = families.map(f => `<option value="${f.code}">${f.name} (${f.code})</option>`).join('');
+        }
+
+        // --- Consultor de Precios Tab ---
+        function renderCheckerResults(filterQuery = '') {
+            const container = document.getElementById('checker-results-container');
+            if(!container) return;
+            container.innerHTML = '';
+
+            const query = filterQuery.toLowerCase();
+            const filtered = inventory.filter(p => p.name.toLowerCase().includes(query) || p.sku.toLowerCase().includes(query) || (p.family && p.family.toLowerCase().includes(query)));
+
+            if(filtered.length === 0) {
+                container.innerHTML = `<div class="bg-white p-6 rounded-2xl border text-center text-slate-400 text-sm">No se encontraron productos coincidentes.</div>`;
+                return;
+            }
+
+            filtered.forEach(p => {
+                const priceBs = p.price * bcvRate;
+                const famObj = families.find(f => f.code === p.family);
+                const famName = famObj ? famObj.name : (p.family || 'General');
+
+                const card = document.createElement('div');
+                card.className = "bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4";
+                card.innerHTML = `
+                    <div>
+                        <span class="text-xs font-mono font-semibold px-2 py-0.5 bg-indigo-50 text-indigo-600 rounded-md">${p.sku}</span>
+                        <h4 class="font-bold text-slate-900 text-base mt-1.5">${p.name}</h4>
+                        <p class="text-xs text-slate-500 mt-0.5">Familia: <span class="font-semibold text-slate-700">${famName}</span> | Stock: <span class="font-semibold ${p.stock < 5 ? 'text-amber-600' : 'text-emerald-600'}">${p.stock} u.</span></p>
+                    </div>
+                    <div class="text-left sm:text-right w-full sm:w-auto bg-slate-50 sm:bg-transparent p-3 sm:p-0 rounded-xl">
+                        <div class="text-xl font-black text-indigo-600">$${p.price.toFixed(2)}</div>
+                        <div class="text-xs font-bold text-slate-500 mt-0.5">Bs. ${priceBs.toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+                    </div>
+                `;
+                container.appendChild(card);
             });
         }
 
-        function filterInventory() {
-            const query = document.getElementById('inventory-search').value.toLowerCase();
-            const filtered = inventory.filter(p => p.code.toLowerCase().includes(query) || p.name.toLowerCase().includes(query));
-            renderInventoryTable(filtered);
+        function filterCheckerResults() {
+            const q = document.getElementById('checker-search-input').value;
+            renderCheckerResults(q);
         }
 
-        function openProductModal(index = -1) {
-            document.getElementById('product-form').reset();
-            document.getElementById('edit-index').value = index;
+        // --- SKU Automático ---
+        function generateAutoSku(family) {
+            const familyItems = inventory.filter(p => p.family === family);
+            const nextNum = familyItems.length + 1;
+            return `${family}-${String(nextNum).padStart(3, '0')}`;
+        }
 
-            if (index >= 0) {
-                const prod = inventory[index];
-                document.getElementById('modal-title').textContent = 'Editar Producto';
-                document.getElementById('prod-code').value = prod.code;
-                document.getElementById('prod-name').value = prod.name;
-                document.getElementById('prod-price').value = prod.price;
-                document.getElementById('prod-stock').value = prod.stock;
-            } else {
-                document.getElementById('modal-title').textContent = 'Nuevo Producto';
+        function onFamilyChange() {
+            const family = document.getElementById('prod-family').value;
+            const skuInput = document.getElementById('prod-sku');
+            const id = document.getElementById('product-id').value;
+            if (!id) {
+                skuInput.value = generateAutoSku(family);
+            }
+        }
+
+        function calculateModalPrice() {
+            const cost = parseFloat(document.getElementById('prod-cost').value) || 0;
+            const margin = parseFloat(document.getElementById('prod-margin').value) || 0;
+            const finalPrice = cost * (1 + (margin / 100));
+            
+            document.getElementById('prod-price').value = finalPrice.toFixed(2);
+            document.getElementById('prod-calc-price-display').value = `$${finalPrice.toFixed(2)}`;
+        }
+
+        // --- Buscador Desplegable en Facturación y Cotizaciones ---
+        function openProductDropdown(type) {
+            const listId = type === 'invoice' ? 'invoice-dropdown-list' : 'quote-dropdown-list';
+            document.getElementById(listId).classList.remove('hidden');
+            filterProductDropdown(type);
+        }
+
+        function filterProductDropdown(type) {
+            const inputId = type === 'invoice' ? 'invoice-product-search' : 'quote-product-search';
+            const listId = type === 'invoice' ? 'invoice-dropdown-list' : 'quote-dropdown-list';
+            const query = document.getElementById(inputId).value.toLowerCase();
+            const listContainer = document.getElementById(listId);
+            listContainer.innerHTML = '';
+
+            const filtered = inventory.filter(p => p.name.toLowerCase().includes(query) || p.sku.toLowerCase().includes(query));
+
+            if (filtered.length === 0) {
+                listContainer.innerHTML = `<div class="p-3 text-xs text-slate-400 text-center">No hay productos disponibles</div>`;
+                listContainer.classList.remove('hidden');
+                return;
             }
 
+            filtered.forEach(p => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = "p-3 hover:bg-indigo-50 cursor-pointer flex items-center justify-between transition text-xs";
+                itemDiv.innerHTML = `
+                    <div>
+                        <span class="font-mono font-semibold text-indigo-600">${p.sku}</span> - <span class="font-bold text-slate-800">${p.name}</span>
+                        <div class="text-[10px] text-slate-400">Stock: ${p.stock}</div>
+                    </div>
+                    <div class="font-bold text-slate-900">$${p.price.toFixed(2)}</div>
+                `;
+                itemDiv.onclick = function() {
+                    selectDropdownProduct(type, p.id, `${p.sku} - ${p.name}`);
+                };
+                listContainer.appendChild(itemDiv);
+            });
+            listContainer.classList.remove('hidden');
+        }
+
+        function selectDropdownProduct(type, id, displayName) {
+            const inputId = type === 'invoice' ? 'invoice-product-search' : 'quote-product-search';
+            const hiddenId = type === 'invoice' ? 'invoice-selected-product-id' : 'quote-selected-product-id';
+            const listId = type === 'invoice' ? 'invoice-dropdown-list' : 'quote-dropdown-list';
+
+            document.getElementById(inputId).value = displayName;
+            document.getElementById(hiddenId).value = id;
+            document.getElementById(listId).classList.add('hidden');
+        }
+
+        // --- Directorio de Clientes ---
+        function openClientDirectoryModal(context = 'invoice') {
+            targetDirectoryContext = context;
+            renderClientDirectory(clients);
+            document.getElementById('client-modal').classList.remove('hidden');
+        }
+
+        function closeClientDirectoryModal() {
+            document.getElementById('client-modal').classList.add('hidden');
+        }
+
+        function renderClientDirectory(clientList) {
+            const listContainer = document.getElementById('client-directory-list');
+            listContainer.innerHTML = '';
+
+            if (clientList.length === 0) {
+                listContainer.innerHTML = `<div class="p-6 text-center text-slate-400 text-xs">No hay clientes guardados todavía. Se registrarán automáticamente al emitir una factura o cotización.</div>`;
+                return;
+            }
+
+            clientList.forEach(c => {
+                const div = document.createElement('div');
+                div.className = "p-3 hover:bg-slate-50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 cursor-pointer transition";
+                div.innerHTML = `
+                    <div>
+                        <p class="font-bold text-slate-900 text-sm">${c.name}</p>
+                        <p class="text-xs text-slate-500">Doc: ${c.doc} | Correo: ${c.email}</p>
+                    </div>
+                    <button onclick="selectClient('${c.name}', '${c.doc}', '${c.email}')" class="px-3 py-1.5 bg-indigo-600 text-white rounded-lg text-xs font-semibold hover:bg-indigo-700 w-full sm:w-auto text-center">Seleccionar</button>
+                `;
+                listContainer.appendChild(div);
+            });
+            lucide.createIcons();
+        }
+
+        function filterClientDirectory() {
+            const query = document.getElementById('search-client-dir').value.toLowerCase();
+            const filtered = clients.filter(c => c.name.toLowerCase().includes(query) || c.doc.toLowerCase().includes(query) || c.email.toLowerCase().includes(query));
+            renderClientDirectory(filtered);
+        }
+
+        function selectClient(name, doc, email) {
+            if (targetDirectoryContext === 'quote') {
+                document.getElementById('quote-client-name').value = name;
+                document.getElementById('quote-client-doc').value = doc;
+                document.getElementById('quote-client-email').value = email;
+            } else {
+                document.getElementById('inv-client-name').value = name;
+                document.getElementById('inv-client-doc').value = doc;
+                document.getElementById('inv-client-email').value = email;
+            }
+            closeClientDirectoryModal();
+            showToast('Cliente seleccionado correctamente');
+        }
+
+        // --- Inventario & Ajuste de Stock Funcional ---
+        function renderInventory(itemsToRender = inventory) {
+            const tbody = document.getElementById('inventory-table-body');
+            const emptyState = document.getElementById('empty-inventory');
+            tbody.innerHTML = '';
+
+            if (itemsToRender.length === 0) {
+                emptyState.classList.remove('hidden');
+                return;
+            }
+            emptyState.classList.add('hidden');
+
+            itemsToRender.forEach(prod => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50/80 transition-colors";
+                const isLow = prod.stock < 5;
+                const priceBs = prod.price * bcvRate;
+                const cost = prod.cost || (prod.price * 0.7);
+                const margin = prod.margin || 30;
+                
+                tr.innerHTML = `
+                    <td class="p-4">
+                        <div class="font-mono text-xs font-bold text-indigo-600">${prod.sku}</div>
+                        <div class="text-[10px] text-slate-400 uppercase font-semibold">Fam: ${prod.family || 'GEN'}</div>
+                    </td>
+                    <td class="p-4 font-medium text-slate-900">${prod.name}</td>
+                    <td class="p-4 text-xs">
+                        <div class="text-slate-600">Costo: <b>$${Number(cost).toFixed(2)}</b></div>
+                        <div class="text-indigo-600 font-semibold">Ganancia: +${margin}%</div>
+                    </td>
+                    <td class="p-4">
+                        <div class="font-semibold text-slate-900">$${Number(prod.price).toFixed(2)}</div>
+                        <div class="text-xs text-slate-400">Bs. ${priceBs.toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+                    </td>
+                    <td class="p-4 font-semibold ${isLow ? 'text-amber-600' : 'text-slate-700'}">${prod.stock}</td>
+                    <td class="p-4 text-right space-x-1 sm:space-x-1.5">
+                        <button onclick="openStockModal('${prod.id}')" class="p-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-lg transition-all" title="Ajustar Stock (+/-)">
+                            <i data-lucide="sliders" class="w-4 h-4"></i>
+                        </button>
+                        <button onclick="editProduct('${prod.id}')" class="p-1.5 bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-600 rounded-lg transition-all" title="Editar">
+                            <i data-lucide="edit-3" class="w-4 h-4"></i>
+                        </button>
+                        <button onclick="deleteProduct('${prod.id}')" class="p-1.5 bg-slate-100 hover:bg-rose-50 hover:text-rose-600 text-slate-600 rounded-lg transition-all" title="Eliminar">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            lucide.createIcons();
+            updateInventoryStats();
+        }
+
+        function openStockModal(id) {
+            const prod = inventory.find(p => p.id === id);
+            if (!prod) return;
+            document.getElementById('adjust-prod-id').value = prod.id;
+            document.getElementById('adjust-prod-name').innerText = `${prod.sku} - ${prod.name} (Stock Actual: ${prod.stock})`;
+            document.getElementById('adjust-qty-input').value = '1';
+            document.getElementById('stock-adjust-modal').classList.remove('hidden');
+        }
+
+        function closeStockModal() {
+            document.getElementById('stock-adjust-modal').classList.add('hidden');
+        }
+
+        function confirmStockAdjustment() {
+            const id = document.getElementById('adjust-prod-id').value;
+            const delta = parseInt(document.getElementById('adjust-qty-input').value);
+            const prod = inventory.find(p => p.id === id);
+            if (!prod) return;
+
+            prod.stock += delta;
+            if (prod.stock < 0) prod.stock = 0;
+
+            localStorage.setItem('si_inventory', JSON.stringify(inventory));
+            closeStockModal();
+            renderInventory();
+            updateInventoryStats();
+            renderCheckerResults();
+            showToast(`Stock actualizado para ${prod.name}`);
+        }
+
+        function updateInventoryStats() {
+            const totalProducts = inventory.length;
+            const totalValue = inventory.reduce((acc, p) => acc + (p.price * p.stock), 0);
+            const totalValueBs = totalValue * bcvRate;
+            const lowStockCount = inventory.filter(p => p.stock < 5).length;
+
+            document.getElementById('stat-total-products').innerText = totalProducts;
+            document.getElementById('stat-total-value').innerText = `$${totalValue.toFixed(2)}`;
+            document.getElementById('stat-total-value-bs').innerText = `Bs. ${totalValueBs.toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+            document.getElementById('stat-low-stock').innerText = lowStockCount;
+        }
+
+        function filterInventory() {
+            const query = document.getElementById('search-inventory').value.toLowerCase();
+            const filtered = inventory.filter(p => p.name.toLowerCase().includes(query) || p.sku.toLowerCase().includes(query) || (p.family && p.family.toLowerCase().includes(query)));
+            renderInventory(filtered);
+        }
+
+        function openProductModal() {
+            document.getElementById('product-form').reset();
+            document.getElementById('product-id').value = '';
+            document.getElementById('modal-title').innerText = 'Nuevo Producto';
+            populateFamilySelects();
+            const firstFam = families.length > 0 ? families[0].code : 'GEN';
+            document.getElementById('prod-family').value = firstFam;
+            document.getElementById('prod-margin').value = '30';
+            document.getElementById('prod-sku').value = generateAutoSku(firstFam);
+            calculateModalPrice();
             document.getElementById('product-modal').classList.remove('hidden');
         }
 
@@ -556,329 +1332,958 @@
             document.getElementById('product-modal').classList.add('hidden');
         }
 
-        function handleProductSubmit(e) {
+        function saveProduct(e) {
             e.preventDefault();
-            const editIndex = parseInt(document.getElementById('edit-index').value);
-            const code = document.getElementById('prod-code').value.trim();
-            const name = document.getElementById('prod-name').value.trim();
+            const id = document.getElementById('product-id').value;
+            const family = document.getElementById('prod-family').value;
+            const sku = document.getElementById('prod-sku').value;
+            const name = document.getElementById('prod-name').value;
+            const cost = parseFloat(document.getElementById('prod-cost').value);
+            const margin = parseFloat(document.getElementById('prod-margin').value);
             const price = parseFloat(document.getElementById('prod-price').value);
             const stock = parseInt(document.getElementById('prod-stock').value);
 
-            if (editIndex >= 0) {
-                inventory[editIndex] = { code, name, price, stock };
-                showToast('Producto actualizado con éxito');
+            if (id) {
+                const prod = inventory.find(p => p.id === id);
+                prod.family = family;
+                prod.sku = sku;
+                prod.name = name;
+                prod.cost = cost;
+                prod.margin = margin;
+                prod.price = price;
+                prod.stock = stock;
+                showToast('Producto actualizado correctamente');
             } else {
-                if (inventory.some(p => p.code === code)) {
-                    showToast('El código de producto ya existe', 'error');
-                    return;
-                }
-                inventory.push({ code, name, price, stock });
+                const newProd = { id: Date.now().toString(), family, sku, name, cost, margin, price, stock };
+                inventory.push(newProd);
                 showToast('Producto agregado al inventario');
             }
 
-            saveInventoryToStorage();
-            renderInventoryTable();
-            populateProductSelect();
+            localStorage.setItem('si_inventory', JSON.stringify(inventory));
             closeProductModal();
+            renderInventory();
+            renderCheckerResults();
+            syncWithCloud('Productos', { id, family, sku, name, cost, margin, price, stock });
         }
 
-        function editProduct(index) {
-            openProductModal(index);
+        function editProduct(id) {
+            const prod = inventory.find(p => p.id === id);
+            if (!prod) return;
+            document.getElementById('product-id').value = prod.id;
+            populateFamilySelects();
+            document.getElementById('prod-family').value = prod.family || (families[0] ? families[0].code : 'GEN');
+            document.getElementById('prod-sku').value = prod.sku;
+            document.getElementById('prod-name').value = prod.name;
+            document.getElementById('prod-cost').value = prod.cost || (prod.price * 0.7).toFixed(2);
+            document.getElementById('prod-margin').value = prod.margin || 30;
+            calculateModalPrice();
+            document.getElementById('prod-stock').value = prod.stock;
+            document.getElementById('modal-title').innerText = 'Editar Producto';
+            document.getElementById('product-modal').classList.remove('hidden');
         }
 
-        function deleteProduct(index) {
-            if (confirm('¿Seguro que deseas eliminar este producto del inventario?')) {
-                inventory.splice(index, 1);
-                saveInventoryToStorage();
-                renderInventoryTable();
-                populateProductSelect();
-                showToast('Producto eliminado');
+        function deleteProduct(id) {
+            if (confirm('¿Estás seguro de eliminar este producto?')) {
+                inventory = inventory.filter(p => p.id !== id);
+                localStorage.setItem('si_inventory', JSON.stringify(inventory));
+                renderInventory();
+                renderCheckerResults();
+                showToast('Producto eliminado', 'error');
             }
         }
 
-        // --- BILLING MODULE & INVOICE MANAGEMENT ---
-        function populateProductSelect() {
-            const select = document.getElementById('select-product');
-            select.innerHTML = '<option value="">-- Buscar por nombre o código --</option>';
-            inventory.forEach((p, idx) => {
-                select.innerHTML += `<option value="${idx}">${p.code} - ${p.name} ($${p.price.toFixed(2)}) [Stock: ${p.stock}]</option>`;
-            });
+        // --- Facturación ---
+        function initInvoiceNumber() {
+            const num = 'FAC-' + String(Math.floor(1000 + Math.random() * 9000));
+            document.getElementById('inv-number').value = num;
         }
 
-        function handleProductSelect() {
-            const selectIdx = document.getElementById('select-product').value;
-            const warning = document.getElementById('stock-warning');
-            if (selectIdx !== "") {
-                const prod = inventory[selectIdx];
-                warning.textContent = `Stock disponible: ${prod.stock} unidades`;
-                warning.classList.remove('hidden');
-            } else {
-                warning.classList.add('hidden');
-            }
-        }
+        function addCartItem() {
+            const selectId = document.getElementById('invoice-selected-product-id').value;
+            const qty = parseInt(document.getElementById('invoice-product-qty').value);
+            if (!selectId) return showToast('Seleccione un producto del buscador desplegable', 'error');
 
-        function addItemToInvoice() {
-            const selectIdx = document.getElementById('select-product').value;
-            const qtyInput = document.getElementById('input-qty');
-            const qty = parseInt(qtyInput.value);
+            const prod = inventory.find(p => p.id === selectId);
+            if (!prod) return;
 
-            if (selectIdx === "") {
-                showToast('Selecciona un producto válido', 'error');
-                return;
+            if (qty > prod.stock) {
+                return showToast(`Stock insuficiente. Disponible: ${prod.stock}`, 'error');
             }
 
-            const product = inventory[selectIdx];
-
-            if (qty <= 0 || isNaN(qty)) {
-                showToast('Ingresa una cantidad válida', 'error');
-                return;
-            }
-
-            if (qty > product.stock) {
-                showToast(`Stock insuficiente. Disponible: ${product.stock}`, 'error');
-                return;
-            }
-
-            // Check if item already in current invoice
-            const existingIndex = currentInvoiceItems.findIndex(i => i.code === product.code);
-            if (existingIndex >= 0) {
-                if (currentInvoiceItems[existingIndex].qty + qty > product.stock) {
-                    showToast('Excede el stock total disponible', 'error');
-                    return;
+            const existingIndex = currentCart.findIndex(item => item.id === selectId);
+            if (existingIndex > -1) {
+                if (currentCart[existingIndex].qty + qty > prod.stock) {
+                    return showToast('Supera el stock disponible', 'error');
                 }
-                currentInvoiceItems[existingIndex].qty += qty;
-                currentInvoiceItems[existingIndex].total = currentInvoiceItems[existingIndex].qty * product.price;
+                currentCart[existingIndex].qty += qty;
             } else {
-                currentInvoiceItems.push({
-                    code: product.code,
-                    name: product.name,
-                    price: product.price,
-                    qty: qty,
-                    total: qty * product.price
-                });
+                currentCart.push({ id: prod.id, sku: prod.sku, name: prod.name, price: prod.price, qty: qty });
             }
 
-            renderInvoiceTable();
-            showToast('Producto añadido a la factura');
-            qtyInput.value = 1;
+            document.getElementById('invoice-product-search').value = '';
+            document.getElementById('invoice-selected-product-id').value = '';
+            renderCart();
         }
 
-        function removeItemFromInvoice(index) {
-            currentInvoiceItems.splice(index, 1);
-            renderInvoiceTable();
-            showToast('Ítem removido');
-        }
-
-        function renderInvoiceTable() {
-            const tbody = document.getElementById('invoice-items-table');
-            const pdfTbody = document.getElementById('pdf-items-body');
+        function renderCart() {
+            const tbody = document.getElementById('cart-table-body');
+            const emptyCart = document.getElementById('empty-cart');
             tbody.innerHTML = '';
-            pdfTbody.innerHTML = '';
 
-            if (currentInvoiceItems.length === 0) {
-                tbody.innerHTML = `<tr id="empty-invoice-row"><td colspan="6" class="text-center py-8 text-slate-400 italic text-xs">No hay productos agregados a esta factura.</td></tr>`;
-                pdfTbody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-slate-400">Sin detalles</td></tr>`;
-                updateInvoiceTotals(0);
-                document.getElementById('items-count').textContent = '0 ítems agregados';
+            if (currentCart.length === 0) {
+                emptyCart.classList.remove('hidden');
+                calculateTotals();
                 return;
             }
+            emptyCart.classList.add('hidden');
 
-            let subtotal = 0;
-
-            currentInvoiceItems.forEach((item, idx) => {
-                subtotal += item.total;
-
-                // Billing Table
-                tbody.innerHTML += `
-                    <tr>
-                        <td class="px-4 py-2 font-medium">${item.code}</td>
-                        <td class="px-4 py-2">${item.name}</td>
-                        <td class="px-4 py-2 text-center">${item.qty}</td>
-                        <td class="px-4 py-2 text-right">$${item.price.toFixed(2)}</td>
-                        <td class="px-4 py-2 text-right font-semibold">$${item.total.toFixed(2)}</td>
-                        <td class="px-4 py-2 text-center">
-                            <button onclick="removeItemFromInvoice(${idx})" class="text-red-500 hover:text-red-700 text-xs"><i class="fa-solid fa-xmark"></i></button>
-                        </td>
-                    </tr>
+            currentCart.forEach((item, index) => {
+                const subtotal = item.price * item.qty;
+                const subtotalBs = subtotal * bcvRate;
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="p-3">
+                        <div class="font-medium text-slate-900">${item.name}</div>
+                        <div class="text-xs font-mono text-slate-400">${item.sku}</div>
+                    </td>
+                    <td class="p-3 text-center font-medium">${item.qty}</td>
+                    <td class="p-3 text-right">
+                        <div class="font-semibold">$${item.price.toFixed(2)}</div>
+                        <div class="text-[11px] text-slate-400">Bs. ${(item.price * bcvRate).toFixed(2)}</div>
+                    </td>
+                    <td class="p-3 text-right">
+                        <div class="font-semibold text-slate-900">$${subtotal.toFixed(2)}</div>
+                        <div class="text-[11px] text-slate-400">Bs. ${subtotalBs.toFixed(2)}</div>
+                    </td>
+                    <td class="p-3 text-center">
+                        <button onclick="removeCartItem(${index})" class="text-slate-400 hover:text-rose-600 transition-colors">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </td>
                 `;
-
-                // PDF Preview Table
-                pdfTbody.innerHTML += `
-                    <tr>
-                        <td class="p-2">${item.code}</td>
-                        <td class="p-2 font-medium">${item.name}</td>
-                        <td class="p-2 text-center">${item.qty}</td>
-                        <td class="p-2 text-right">$${item.price.toFixed(2)}</td>
-                        <td class="p-2 text-right font-bold">$${item.total.toFixed(2)}</td>
-                    </tr>
-                `;
+                tbody.appendChild(tr);
             });
-
-            document.getElementById('items-count').textContent = `${currentInvoiceItems.length} ítem(s) en total`;
-            updateInvoiceTotals(subtotal);
+            lucide.createIcons();
+            calculateTotals();
         }
 
-        function updateInvoiceTotals(subtotal) {
-            const tax = subtotal * 0.16;
+        function removeCartItem(index) {
+            currentCart.splice(index, 1);
+            renderCart();
+        }
+
+        function calculateTotals() {
+            const subtotal = currentCart.reduce((acc, item) => acc + (item.price * item.qty), 0);
+            const subtotalBs = subtotal * bcvRate;
+            const taxRate = parseFloat(document.getElementById('tax-rate').value) || 0;
+            const tax = subtotal * (taxRate / 100);
+            const taxBs = tax * bcvRate;
+            const total = subtotal + tax;
+            const totalBs = total * bcvRate;
+
+            document.getElementById('summary-subtotal').innerText = `$${subtotal.toFixed(2)}`;
+            document.getElementById('summary-subtotal-bs').innerText = `Bs. ${subtotalBs.toFixed(2)}`;
+            document.getElementById('summary-tax').innerText = `$${tax.toFixed(2)}`;
+            document.getElementById('summary-tax-bs').innerText = `Bs. ${taxBs.toFixed(2)}`;
+            document.getElementById('summary-total').innerText = `$${total.toFixed(2)}`;
+            document.getElementById('summary-total-bs').innerText = `Bs. ${totalBs.toFixed(2)}`;
+        }
+
+        function clearInvoiceForm() {
+            currentCart = [];
+            document.getElementById('inv-client-name').value = '';
+            document.getElementById('inv-client-doc').value = '';
+            document.getElementById('inv-client-email').value = '';
+            renderCart();
+            showToast('Formulario limpiado');
+        }
+
+        // ==========================================
+        // MÓDULO DE COTIZACIONES
+        // ==========================================
+        function initQuoteNumber() {
+            const num = 'COT-' + String(Math.floor(1000 + Math.random() * 9000));
+            const el = document.getElementById('quote-number');
+            if (el) el.value = num;
+        }
+
+        function addQuoteCartItem() {
+            const selectId = document.getElementById('quote-selected-product-id').value;
+            const qty = parseInt(document.getElementById('quote-product-qty').value);
+            if (!selectId) return showToast('Seleccione un producto del buscador desplegable', 'error');
+
+            const prod = inventory.find(p => p.id === selectId);
+            if (!prod) return;
+
+            const existingIndex = currentQuoteCart.findIndex(item => item.id === selectId);
+            if (existingIndex > -1) {
+                currentQuoteCart[existingIndex].qty += qty;
+            } else {
+                currentQuoteCart.push({ id: prod.id, sku: prod.sku, name: prod.name, price: prod.price, qty: qty });
+            }
+
+            document.getElementById('quote-product-search').value = '';
+            document.getElementById('quote-selected-product-id').value = '';
+            renderQuoteCart();
+        }
+
+        function renderQuoteCart() {
+            const tbody = document.getElementById('quote-cart-table-body');
+            const emptyCart = document.getElementById('empty-quote-cart');
+            tbody.innerHTML = '';
+
+            if (currentQuoteCart.length === 0) {
+                emptyCart.classList.remove('hidden');
+                calculateQuoteTotals();
+                return;
+            }
+            emptyCart.classList.add('hidden');
+
+            currentQuoteCart.forEach((item, index) => {
+                const subtotal = item.price * item.qty;
+                const subtotalBs = subtotal * bcvRate;
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="p-3">
+                        <div class="font-medium text-slate-900">${item.name}</div>
+                        <div class="text-xs font-mono text-slate-400">${item.sku}</div>
+                    </td>
+                    <td class="p-3 text-center font-medium">${item.qty}</td>
+                    <td class="p-3 text-right">
+                        <div class="font-semibold">$${item.price.toFixed(2)}</div>
+                        <div class="text-[11px] text-slate-400">Bs. ${(item.price * bcvRate).toFixed(2)}</div>
+                    </td>
+                    <td class="p-3 text-right">
+                        <div class="font-semibold text-slate-900">$${subtotal.toFixed(2)}</div>
+                        <div class="text-[11px] text-slate-400">Bs. ${subtotalBs.toFixed(2)}</div>
+                    </td>
+                    <td class="p-3 text-center">
+                        <button onclick="removeQuoteCartItem(${index})" class="text-slate-400 hover:text-rose-600 transition-colors">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            lucide.createIcons();
+            calculateQuoteTotals();
+        }
+
+        function removeQuoteCartItem(index) {
+            currentQuoteCart.splice(index, 1);
+            renderQuoteCart();
+        }
+
+        function calculateQuoteTotals() {
+            const subtotal = currentQuoteCart.reduce((acc, item) => acc + (item.price * item.qty), 0);
+            const subtotalBs = subtotal * bcvRate;
+            const taxRate = parseFloat(document.getElementById('quote-tax-rate').value) || 0;
+            const tax = subtotal * (taxRate / 100);
+            const taxBs = tax * bcvRate;
+            const total = subtotal + tax;
+            const totalBs = total * bcvRate;
+
+            document.getElementById('quote-summary-subtotal').innerText = `$${subtotal.toFixed(2)}`;
+            document.getElementById('quote-summary-subtotal-bs').innerText = `Bs. ${subtotalBs.toFixed(2)}`;
+            document.getElementById('quote-summary-tax').innerText = `$${tax.toFixed(2)}`;
+            document.getElementById('quote-summary-tax-bs').innerText = `Bs. ${taxBs.toFixed(2)}`;
+            document.getElementById('quote-summary-total').innerText = `$${total.toFixed(2)}`;
+            document.getElementById('quote-summary-total-bs').innerText = `Bs. ${totalBs.toFixed(2)}`;
+        }
+
+        function clearQuoteForm() {
+            currentQuoteCart = [];
+            document.getElementById('quote-client-name').value = '';
+            document.getElementById('quote-client-doc').value = '';
+            document.getElementById('quote-client-email').value = '';
+            renderQuoteCart();
+            initQuoteNumber();
+            showToast('Cotización limpiada');
+        }
+
+        function generateQuotePDF() {
+            if (currentQuoteCart.length === 0) return showToast('Agrega productos a la cotización', 'error');
+            const clientName = document.getElementById('quote-client-name').value.trim() || 'Cliente Solicitante';
+            const clientDoc = document.getElementById('quote-client-doc').value.trim() || 'V-00000000';
+            const clientEmail = document.getElementById('quote-client-email').value.trim() || 'contacto@cliente.com';
+            const quoteNumber = document.getElementById('quote-number').value;
+            const taxRate = parseFloat(document.getElementById('quote-tax-rate').value) || 16;
+
+            if (clientDoc !== 'V-00000000' && !clients.some(c => c.doc === clientDoc)) {
+                clients.push({ id: Date.now().toString(), name: clientName, doc: clientDoc, email: clientEmail });
+                localStorage.setItem('si_clients', JSON.stringify(clients));
+            }
+
+            const subtotal = currentQuoteCart.reduce((acc, item) => acc + (item.price * item.qty), 0);
+            const tax = subtotal * (taxRate / 100);
             const total = subtotal + tax;
 
-            document.getElementById('summary-subtotal').textContent = `$${subtotal.toFixed(2)}`;
-            document.getElementById('summary-tax').textContent = `$${tax.toFixed(2)}`;
-            document.getElementById('summary-total').textContent = `$${total.toFixed(2)}`;
-
-            document.getElementById('pdf-subtotal').textContent = `$${subtotal.toFixed(2)}`;
-            document.getElementById('pdf-tax').textContent = `$${tax.toFixed(2)}`;
-            document.getElementById('pdf-total').textContent = `$${total.toFixed(2)}`;
-        }
-
-        function setupCustomerLivePreview() {
-            const bindInput = (inputId, pdfId) => {
-                const el = document.getElementById(inputId);
-                el.addEventListener('input', () => {
-                    document.getElementById(pdfId).textContent = el.value || '---';
-                });
+            const newQuote = {
+                id: quoteNumber,
+                date: new Date().toLocaleDateString(),
+                client: clientName,
+                doc: clientDoc,
+                email: clientEmail,
+                items: [...currentQuoteCart],
+                subtotal,
+                tax,
+                total,
+                status: 'Emitida'
             };
+            quotes.push(newQuote);
+            localStorage.setItem('si_quotes', JSON.stringify(quotes));
+            renderQuotesHistory();
 
-            bindInput('client-name', 'pdf-client-name');
-            bindInput('client-id', 'pdf-client-id');
-            bindInput('client-email', 'pdf-client-email');
-            bindInput('client-address', 'pdf-client-address');
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            doc.setFont('inter', 'bold');
+            doc.setFontSize(16);
+            doc.setTextColor(15, 23, 42);
+            doc.text(currentUser.businessName, 14, 18);
+
+            doc.setFont('inter', 'normal');
+            doc.setFontSize(9);
+            doc.setTextColor(100, 116, 139);
+            doc.text(`RIF: ${currentUser.rif}`, 14, 24);
+            doc.text(currentUser.address, 14, 29);
+            doc.text(`Teléfono: ${currentUser.phone}`, 14, 34);
+
+            doc.setFillColor(238, 242, 255);
+            doc.roundedRect(130, 12, 66, 7, 1, 1, 'F');
+            doc.setFont('inter', 'bold');
+            doc.setFontSize(9);
+            doc.setTextColor(79, 70, 229);
+            doc.text('COTIZACIÓN DE VENTA', 133, 17);
+
+            doc.setFont('inter', 'bold');
+            doc.setFontSize(12);
+            doc.setTextColor(15, 23, 42);
+            doc.text(quoteNumber, 192, 26, { align: 'right' });
+
+            doc.setFont('inter', 'normal');
+            doc.setFontSize(9);
+            doc.setTextColor(100, 116, 139);
+            doc.text(`Fecha: ${new Date().toLocaleDateString()}`, 192, 32, { align: 'right' });
+
+            doc.setDrawColor(226, 232, 240);
+            doc.line(14, 40, 196, 40);
+
+            doc.setFillColor(248, 250, 252);
+            doc.roundedRect(14, 46, 182, 30, 2, 2, 'F');
+            doc.setDrawColor(226, 232, 240);
+            doc.roundedRect(14, 46, 182, 30, 2, 2, 'S');
+
+            doc.setFont('inter', 'bold');
+            doc.setFontSize(8);
+            doc.setTextColor(100, 116, 139);
+            doc.text('DIRIGIDO A:', 18, 52);
+
+            doc.setFont('inter', 'normal');
+            doc.setFontSize(9);
+            doc.setTextColor(71, 85, 105);
+            doc.text('Nombre/Razón Social:', 18, 59);
+            doc.text('Identificación:', 110, 59);
+            doc.text('Email:', 18, 68);
+
+            doc.setFont('inter', 'bold');
+            doc.setTextColor(15, 23, 42);
+            doc.text(clientName, 52, 59);
+            doc.text(clientDoc, 135, 59);
+            doc.setFont('inter', 'normal');
+            doc.text(clientEmail, 29, 68);
+
+            const tableRows = currentQuoteCart.map(item => [
+                item.sku,
+                item.name,
+                item.qty,
+                `$${item.price.toFixed(2)}`,
+                `$${(item.price * item.qty).toFixed(2)}`
+            ]);
+
+            doc.autoTable({
+                startY: 84,
+                head: [['CÓDIGO', 'DESCRIPCIÓN', 'CANT.', 'P. UNIT', 'TOTAL']],
+                body: tableRows,
+                theme: 'plain',
+                headStyles: { fillColor: [15, 23, 42], textColor: [255, 255, 255], fontStyle: 'bold', fontSize: 9 },
+                bodyStyles: { fontSize: 9, textColor: [51, 65, 85] },
+                columnStyles: {
+                    0: { cellWidth: 28 },
+                    1: { cellWidth: 78 },
+                    2: { cellWidth: 20, halign: 'center' },
+                    3: { cellWidth: 28, halign: 'right' },
+                    4: { cellWidth: 28, halign: 'right' }
+                },
+                margin: { left: 14, right: 14 }
+            });
+
+            const finalY = doc.lastAutoTable.finalY + 10;
+            doc.setFont('inter', 'normal');
+            doc.setFontSize(9);
+            doc.setTextColor(100, 116, 139);
+            doc.text('Subtotal:', 140, finalY);
+            doc.text(`$${subtotal.toFixed(2)}`, 196, finalY, { align: 'right' });
+
+            doc.text(`Impuestos (${taxRate}% IVA):`, 140, finalY + 6);
+            doc.text(`$${tax.toFixed(2)}`, 196, finalY + 6, { align: 'right' });
+
+            doc.setDrawColor(226, 232, 240);
+            doc.line(130, finalY + 10, 196, finalY + 10);
+
+            doc.setFont('inter', 'bold');
+            doc.setFontSize(11);
+            doc.setTextColor(15, 23, 42);
+            doc.text('TOTAL ESTIMADO:', 140, finalY + 17);
+            doc.setTextColor(79, 70, 229);
+            doc.text(`$${total.toFixed(2)}`, 196, finalY + 17, { align: 'right' });
+
+            doc.save(`${quoteNumber}.pdf`);
+            showToast('Cotización emitida y PDF descargado');
+
+            currentQuoteCart = [];
+            renderQuoteCart();
+            initQuoteNumber();
         }
 
-        function updateInvoiceDate() {
-            const today = new Date().toLocaleDateString('es-ES');
-            document.getElementById('pdf-invoice-date').textContent = today;
+        function renderQuotesHistory() {
+            const tbody = document.getElementById('quotes-history-table-body');
+            const emptyEl = document.getElementById('empty-quotes-history');
+            if(!tbody) return;
+            tbody.innerHTML = '';
+
+            if (quotes.length === 0) {
+                emptyEl.classList.remove('hidden');
+                return;
+            }
+            emptyEl.classList.add('hidden');
+
+            quotes.slice().reverse().forEach(q => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition-colors";
+                const totalBs = q.total * bcvRate;
+                const isCancelled = q.status === 'Cancelada';
+
+                tr.innerHTML = `
+                    <td class="p-3 font-mono font-semibold text-indigo-600 text-xs">${q.id}</td>
+                    <td class="p-3 text-slate-600 text-xs">${q.date}</td>
+                    <td class="p-3 font-medium text-slate-900 text-xs">${q.client}</td>
+                    <td class="p-3 text-right text-xs">
+                        <div class="font-semibold text-slate-900">$${q.total.toFixed(2)}</div>
+                        <div class="text-[10px] text-slate-400">Bs. ${totalBs.toFixed(2)}</div>
+                    </td>
+                    <td class="p-3 text-center">
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold ${isCancelled ? 'bg-rose-100 text-rose-700' : 'bg-indigo-100 text-indigo-700'}">
+                            ${q.status}
+                        </span>
+                    </td>
+                    <td class="p-3 text-right space-x-1">
+                        <button onclick="reprintQuote('${q.id}')" class="px-2 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-lg text-xs font-semibold inline-flex items-center gap-1" title="Descargar PDF">
+                            <i data-lucide="download" class="w-3 h-3"></i>
+                        </button>
+                        ${isCancelled ? `
+                            <span class="text-xs text-slate-400 italic">Cancelada</span>
+                        ` : `
+                            <button onclick="cancelQuote('${q.id}')" class="px-2 py-1 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg text-xs font-semibold inline-flex items-center gap-1" title="Cancelar Cotización">
+                                <i data-lucide="x-circle" class="w-3 h-3"></i>
+                            </button>
+                        `}
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            lucide.createIcons();
         }
 
-        function updatePdfHeaderNumber() {
-            const formattedNum = 'FAC-' + String(invoiceCounter).padStart(4, '0');
-            document.getElementById('pdf-invoice-number').textContent = formattedNum;
+        function cancelQuote(id) {
+            const q = quotes.find(item => item.id === id);
+            if (!q) return;
+            if (confirm(`¿Estás seguro de cancelar la cotización ${q.id}?`)) {
+                q.status = 'Cancelada';
+                localStorage.setItem('si_quotes', JSON.stringify(quotes));
+                renderQuotesHistory();
+                showToast(`Cotización ${q.id} cancelada`);
+            }
         }
 
-        // --- PDF GENERATION & STOCK DEDUCTION ---
+        function reprintQuote(id) {
+            const q = quotes.find(item => item.id === id);
+            if (!q) return;
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            doc.setFont('inter', 'bold');
+            doc.setFontSize(16);
+            doc.setTextColor(15, 23, 42);
+            doc.text(currentUser.businessName, 14, 18);
+
+            doc.setFont('inter', 'normal');
+            doc.setFontSize(9);
+            doc.setTextColor(100, 116, 139);
+            doc.text(`RIF: ${currentUser.rif}`, 14, 24);
+            doc.text(currentUser.address, 14, 29);
+            doc.text(`Teléfono: ${currentUser.phone}`, 14, 34);
+
+            doc.setFillColor(238, 242, 255);
+            doc.roundedRect(130, 12, 66, 7, 1, 1, 'F');
+            doc.setFont('inter', 'bold');
+            doc.setFontSize(9);
+            doc.setTextColor(79, 70, 229);
+            doc.text('COTIZACIÓN DE VENTA', 133, 17);
+
+            doc.setFont('inter', 'bold');
+            doc.setFontSize(12);
+            doc.setTextColor(15, 23, 42);
+            doc.text(q.id, 192, 26, { align: 'right' });
+
+            doc.setFont('inter', 'normal');
+            doc.setFontSize(9);
+            doc.setTextColor(100, 116, 139);
+            doc.text(`Fecha: ${q.date}`, 192, 32, { align: 'right' });
+
+            doc.setDrawColor(226, 232, 240);
+            doc.line(14, 40, 196, 40);
+
+            doc.setFillColor(248, 250, 252);
+            doc.roundedRect(14, 46, 182, 30, 2, 2, 'F');
+            doc.setDrawColor(226, 232, 240);
+            doc.roundedRect(14, 46, 182, 30, 2, 2, 'S');
+
+            doc.setFont('inter', 'bold');
+            doc.setFontSize(8);
+            doc.setTextColor(100, 116, 139);
+            doc.text('DIRIGIDO A:', 18, 52);
+
+            doc.setFont('inter', 'normal');
+            doc.setFontSize(9);
+            doc.setTextColor(71, 85, 105);
+            doc.text('Nombre/Razón Social:', 18, 59);
+            doc.text('Identificación:', 110, 59);
+            doc.text('Email:', 18, 68);
+
+            doc.setFont('inter', 'bold');
+            doc.setTextColor(15, 23, 42);
+            doc.text(q.client, 52, 59);
+            doc.text(q.doc, 135, 59);
+            doc.setFont('inter', 'normal');
+            doc.text(q.email, 29, 68);
+
+            const tableRows = q.items.map(item => [
+                item.sku,
+                item.name,
+                item.qty,
+                `$${item.price.toFixed(2)}`,
+                `$${(item.price * item.qty).toFixed(2)}`
+            ]);
+
+            doc.autoTable({
+                startY: 84,
+                head: [['CÓDIGO', 'DESCRIPCIÓN', 'CANT.', 'P. UNIT', 'TOTAL']],
+                body: tableRows,
+                theme: 'plain',
+                headStyles: { fillColor: [15, 23, 42], textColor: [255, 255, 255], fontStyle: 'bold', fontSize: 9 },
+                bodyStyles: { fontSize: 9, textColor: [51, 65, 85] },
+                columnStyles: {
+                    0: { cellWidth: 28 },
+                    1: { cellWidth: 78 },
+                    2: { cellWidth: 20, halign: 'center' },
+                    3: { cellWidth: 28, halign: 'right' },
+                    4: { cellWidth: 28, halign: 'right' }
+                },
+                margin: { left: 14, right: 14 }
+            });
+
+            const finalY = doc.lastAutoTable.finalY + 10;
+            doc.setFont('inter', 'normal');
+            doc.setFontSize(9);
+            doc.setTextColor(100, 116, 139);
+            doc.text('Subtotal:', 140, finalY);
+            doc.text(`$${q.subtotal.toFixed(2)}`, 196, finalY, { align: 'right' });
+            doc.text('Impuestos (16% IVA):', 140, finalY + 6);
+            doc.text(`$${q.tax.toFixed(2)}`, 196, finalY + 6, { align: 'right' });
+            doc.setDrawColor(226, 232, 240);
+            doc.line(130, finalY + 10, 196, finalY + 10);
+            doc.setFont('inter', 'bold');
+            doc.setFontSize(11);
+            doc.setTextColor(15, 23, 42);
+            doc.text('TOTAL ESTIMADO:', 140, finalY + 17);
+            doc.setTextColor(79, 70, 229);
+            doc.text(`$${q.total.toFixed(2)}`, 196, finalY + 17, { align: 'right' });
+
+            doc.save(`${q.id}.pdf`);
+            showToast('PDF de cotización descargado');
+        }
+
+        // --- Generación de PDF de Factura ---
         function generatePDF() {
-            if (currentInvoiceItems.length === 0) {
-                showToast('Agrega al menos un producto a la factura', 'error');
-                return;
+            if (currentCart.length === 0) return showToast('Agrega productos al carrito primero', 'error');
+            const clientName = document.getElementById('inv-client-name').value.trim() || '*Empresa Cliente S.A.*';
+            const clientDoc = document.getElementById('inv-client-doc').value.trim() || '123456789001';
+            const clientEmail = document.getElementById('inv-client-email').value.trim() || 'contacto@cliente.com';
+            const invNumber = document.getElementById('inv-number').value;
+            const taxRate = parseFloat(document.getElementById('tax-rate').value) || 16;
+
+            if (clientDoc !== '123456789001' && !clients.some(c => c.doc === clientDoc)) {
+                const newClient = { id: Date.now().toString(), name: clientName, doc: clientDoc, email: clientEmail };
+                clients.push(newClient);
+                localStorage.setItem('si_clients', JSON.stringify(clients));
             }
 
-            // Deduct Stock
-            currentInvoiceItems.forEach(item => {
-                const prod = inventory.find(p => p.code === item.code);
-                if (prod) {
-                    prod.stock -= item.qty;
-                }
+            const subtotal = currentCart.reduce((acc, item) => acc + (item.price * item.qty), 0);
+            const tax = subtotal * (taxRate / 100);
+            const total = subtotal + tax;
+
+            currentCart.forEach(cartItem => {
+                const prod = inventory.find(p => p.id === cartItem.id);
+                if (prod) prod.stock -= cartItem.qty;
             });
+            localStorage.setItem('si_inventory', JSON.stringify(inventory));
 
-            saveInventoryToStorage();
-            renderInventoryTable();
-            populateProductSelect();
-
-            // Prepare PDF options
-            const element = document.getElementById('invoice-pdf-template');
-            const invNum = document.getElementById('pdf-invoice-number').textContent;
-            
-            const opt = {
-                margin:       [0.3, 0.3, 0.3, 0.3],
-                filename:     `Factura_${invNum}.pdf`,
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2 },
-                jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+            const newInvoice = {
+                id: invNumber,
+                date: new Date().toLocaleDateString(),
+                client: clientName,
+                doc: clientDoc,
+                email: clientEmail,
+                items: [...currentCart],
+                subtotal,
+                tax,
+                total,
+                returned: false
             };
+            invoices.push(newInvoice);
+            localStorage.setItem('si_invoices', JSON.stringify(invoices));
+            syncWithCloud('Facturas', newInvoice);
 
-            showToast('Generando factura PDF...');
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
 
-            html2pdf().set(opt).from(element).save().then(() => {
-                showToast('Factura generada y descargada');
-                
-                // Sync to Google Drive / Cloud if configured
-                syncInvoiceToCloud();
+            doc.setFont('inter', 'bold');
+            doc.setFontSize(16);
+            doc.setTextColor(15, 23, 42);
+            doc.text(currentUser.businessName, 14, 18);
 
-                // Increment invoice counter & reset billing form
-                invoiceCounter++;
-                localStorage.setItem('app_invoice_counter', invoiceCounter);
-                updatePdfHeaderNumber();
-                currentInvoiceItems = [];
-                renderInvoiceTable();
+            doc.setFont('inter', 'normal');
+            doc.setFontSize(9);
+            doc.setTextColor(100, 116, 139);
+            doc.text(`RIF: ${currentUser.rif}`, 14, 24);
+            doc.text(currentUser.address, 14, 29);
+            doc.text(`Teléfono: ${currentUser.phone}`, 14, 34);
+
+            doc.setFillColor(224, 231, 255);
+            doc.roundedRect(140, 12, 56, 7, 1, 1, 'F');
+            doc.setFont('inter', 'bold');
+            doc.setFontSize(9);
+            doc.setTextColor(67, 56, 202);
+            doc.text('FACTURA DE VENTA', 143, 17);
+
+            doc.setFont('inter', 'bold');
+            doc.setFontSize(12);
+            doc.setTextColor(15, 23, 42);
+            doc.text(invNumber, 172, 26, { align: 'right' });
+
+            doc.setFont('inter', 'normal');
+            doc.setFontSize(9);
+            doc.setTextColor(100, 116, 139);
+            doc.text(`Fecha: ${new Date().toLocaleDateString()}`, 172, 32, { align: 'right' });
+
+            doc.setDrawColor(226, 232, 240);
+            doc.line(14, 40, 196, 40);
+
+            doc.setFillColor(248, 250, 252);
+            doc.roundedRect(14, 46, 182, 30, 2, 2, 'F');
+            doc.setDrawColor(226, 232, 240);
+            doc.roundedRect(14, 46, 182, 30, 2, 2, 'S');
+
+            doc.setFont('inter', 'bold');
+            doc.setFontSize(8);
+            doc.setTextColor(100, 116, 139);
+            doc.text('CLIENTE', 18, 52);
+
+            doc.setFont('inter', 'normal');
+            doc.setFontSize(9);
+            doc.setTextColor(71, 85, 105);
+            doc.text('Nombre/Razón Social:', 18, 59);
+            doc.text('Identificación:', 110, 59);
+            doc.text('Email:', 18, 68);
+
+            doc.setFont('inter', 'bold');
+            doc.setTextColor(15, 23, 42);
+            doc.text(clientName, 52, 59);
+            doc.text(clientDoc, 135, 59);
+            doc.setFont('inter', 'normal');
+            doc.text(clientEmail, 29, 68);
+
+            const tableRows = currentCart.map(item => [
+                item.sku,
+                item.name,
+                item.qty,
+                `$${item.price.toFixed(2)}`,
+                `$${(item.price * item.qty).toFixed(2)}`
+            ]);
+
+            doc.autoTable({
+                startY: 84,
+                head: [['CÓDIGO', 'DESCRIPCIÓN', 'CANT.', 'P. UNIT', 'TOTAL']],
+                body: tableRows,
+                theme: 'plain',
+                headStyles: { fillColor: [15, 23, 42], textColor: [255, 255, 255], fontStyle: 'bold', fontSize: 9 },
+                bodyStyles: { fontSize: 9, textColor: [51, 65, 85] },
+                columnStyles: {
+                    0: { cellWidth: 28 },
+                    1: { cellWidth: 78 },
+                    2: { cellWidth: 20, halign: 'center' },
+                    3: { cellWidth: 28, halign: 'right' },
+                    4: { cellWidth: 28, halign: 'right' }
+                },
+                margin: { left: 14, right: 14 }
             });
+
+            const finalY = doc.lastAutoTable.finalY + 10;
+            doc.setFont('inter', 'normal');
+            doc.setFontSize(9);
+            doc.setTextColor(100, 116, 139);
+            doc.text('Subtotal:', 140, finalY);
+            doc.text(`$${subtotal.toFixed(2)}`, 196, finalY, { align: 'right' });
+
+            doc.text(`Impuestos (${taxRate}% IVA):`, 140, finalY + 6);
+            doc.text(`$${tax.toFixed(2)}`, 196, finalY + 6, { align: 'right' });
+
+            doc.setDrawColor(226, 232, 240);
+            doc.line(130, finalY + 10, 196, finalY + 10);
+
+            doc.setFont('inter', 'bold');
+            doc.setFontSize(11);
+            doc.setTextColor(15, 23, 42);
+            doc.text('TOTAL A PAGAR:', 140, finalY + 17);
+            doc.setTextColor(79, 70, 229);
+            doc.text(`$${total.toFixed(2)}`, 196, finalY + 17, { align: 'right' });
+
+            doc.save(`${invNumber}.pdf`);
+            showToast('Factura generada y PDF descargado');
+
+            currentCart = [];
+            renderCart();
+            initInvoiceNumber();
+            renderInventory();
+            renderCheckerResults();
+            renderHistory();
         }
 
-        // --- CLOUD SYNCHRONIZATION ---
-        function saveCloudConfig() {
-            const url = document.getElementById('cloud-script-url').value.trim();
-            cloudScriptUrl = url;
-            localStorage.setItem('app_cloud_url', url);
-            updateSyncStatus(url ? 'Conectado a Apps Script' : 'Modo Local', !!url);
-            showToast('Configuración guardada');
-        }
+        // --- Historial ---
+        function renderHistory() {
+            const tbody = document.getElementById('history-table-body');
+            const emptyHistory = document.getElementById('empty-history');
+            const query = (document.getElementById('search-history')?.value || '').toLowerCase();
+            if(!tbody) return;
+            tbody.innerHTML = '';
 
-        function testCloudConnection() {
-            const url = document.getElementById('cloud-script-url').value.trim();
-            if (!url) {
-                showToast('Ingresa una URL de Google Apps Script', 'error');
+            const filteredInvoices = invoices.filter(inv => 
+                inv.id.toLowerCase().includes(query) || 
+                inv.client.toLowerCase().includes(query)
+            );
+
+            if (filteredInvoices.length === 0) {
+                emptyHistory.classList.remove('hidden');
                 return;
             }
+            emptyHistory.classList.add('hidden');
 
-            fetch(url + '?action=ping')
-                .then(res => res.json())
-                .then(data => {
-                    showToast('Conexión exitosa con la Nube');
-                })
-                .catch(err => {
-                    showToast('Error de conexión con el script de Google', 'error');
+            filteredInvoices.slice().reverse().forEach(inv => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition-colors";
+                const totalBs = inv.total * bcvRate;
+                tr.innerHTML = `
+                    <td class="p-4 font-mono font-semibold text-indigo-600 text-xs">${inv.id}</td>
+                    <td class="p-4 text-slate-600 text-xs">${inv.date}</td>
+                    <td class="p-4 font-medium text-slate-900 text-xs">${inv.client}</td>
+                    <td class="p-4 text-xs">
+                        <div class="font-semibold text-slate-900">$${inv.total.toFixed(2)}</div>
+                        <div class="text-[11px] text-slate-400">Bs. ${totalBs.toFixed(2)}</div>
+                    </td>
+                    <td class="p-4">
+                        <span class="px-2 py-0.5 rounded-full text-[11px] font-semibold ${inv.returned ? 'bg-rose-100 text-rose-700' : 'bg-emerald-100 text-emerald-700'}">
+                            ${inv.returned ? 'Devuelta' : 'Emitida'}
+                        </span>
+                    </td>
+                    <td class="p-4 text-right space-x-1 sm:space-x-2">
+                        <button onclick="reprintInvoice('${inv.id}')" class="px-2.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-lg text-xs font-semibold transition-all inline-flex items-center gap-1">
+                            <i data-lucide="download" class="w-3.5 h-3.5"></i> PDF
+                        </button>
+                        ${inv.returned ? `
+                            <button disabled class="px-2.5 py-1.5 bg-slate-100 text-slate-400 rounded-lg text-xs font-semibold cursor-not-allowed inline-flex items-center gap-1">
+                                <i data-lucide="check" class="w-3.5 h-3.5"></i> Devuelta
+                            </button>
+                        ` : `
+                            <button onclick="processReturnDirectly('${inv.id}')" class="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg text-xs font-semibold transition-all inline-flex items-center gap-1">
+                                <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Devolver
+                            </button>
+                        `}
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            lucide.createIcons();
+        }
+
+        function processReturnDirectly(invoiceId) {
+            const inv = invoices.find(i => i.id === invoiceId);
+            if (!inv) return showToast('Factura no encontrada', 'error');
+            if (inv.returned) return showToast('Esta factura ya fue devuelta', 'error');
+
+            if (confirm(`¿Confirmas la devolución de la factura ${inv.id}? El stock será devuelto al inventario.`)) {
+                inv.items.forEach(returnedItem => {
+                    const prod = inventory.find(p => p.id === returnedItem.id);
+                    if (prod) {
+                        prod.stock += returnedItem.qty;
+                    } else {
+                        inventory.push({
+                            id: returnedItem.id,
+                            sku: returnedItem.sku,
+                            name: returnedItem.name,
+                            price: returnedItem.price,
+                            stock: returnedItem.qty
+                        });
+                    }
                 });
+
+                inv.returned = true;
+                localStorage.setItem('si_inventory', JSON.stringify(inventory));
+                localStorage.setItem('si_invoices', JSON.stringify(invoices));
+
+                renderInventory();
+                renderCheckerResults();
+                renderHistory();
+                showToast(`Devolución procesada con éxito para ${inv.id}`);
+            }
         }
 
-        function syncInvoiceToCloud() {
-            if (!cloudScriptUrl) return;
+        function reprintInvoice(id) {
+            const inv = invoices.find(i => i.id === id);
+            if (!inv) return;
 
-            const payload = {
-                action: 'saveInvoice',
-                invoiceNumber: document.getElementById('pdf-invoice-number').textContent,
-                clientName: document.getElementById('client-name').value,
-                total: document.getElementById('summary-total').textContent,
-                items: currentInvoiceItems
-            };
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
 
-            fetch(cloudScriptUrl, {
+            doc.setFont('inter', 'bold');
+            doc.setFontSize(16);
+            doc.setTextColor(15, 23, 42);
+            doc.text(currentUser.businessName, 14, 18);
+
+            doc.setFont('inter', 'normal');
+            doc.setFontSize(9);
+            doc.setTextColor(100, 116, 139);
+            doc.text(`RIF: ${currentUser.rif}`, 14, 24);
+            doc.text(currentUser.address, 14, 29);
+            doc.text(`Teléfono: ${currentUser.phone}`, 14, 34);
+
+            doc.setFillColor(224, 231, 255);
+            doc.roundedRect(140, 12, 56, 7, 1, 1, 'F');
+            doc.setFont('inter', 'bold');
+            doc.setFontSize(9);
+            doc.setTextColor(67, 56, 202);
+            doc.text('FACTURA DE VENTA', 143, 17);
+
+            doc.setFont('inter', 'bold');
+            doc.setFontSize(12);
+            doc.setTextColor(15, 23, 42);
+            doc.text(inv.id, 172, 26, { align: 'right' });
+
+            doc.setFont('inter', 'normal');
+            doc.setFontSize(9);
+            doc.setTextColor(100, 116, 139);
+            doc.text(`Fecha: ${inv.date}`, 172, 32, { align: 'right' });
+
+            doc.setDrawColor(226, 232, 240);
+            doc.line(14, 40, 196, 40);
+
+            doc.setFillColor(248, 250, 252);
+            doc.roundedRect(14, 46, 182, 30, 2, 2, 'F');
+            doc.setDrawColor(226, 232, 240);
+            doc.roundedRect(14, 46, 182, 30, 2, 2, 'S');
+
+            doc.setFont('inter', 'bold');
+            doc.setFontSize(8);
+            doc.setTextColor(100, 116, 139);
+            doc.text('CLIENTE', 18, 52);
+
+            doc.setFont('inter', 'normal');
+            doc.setFontSize(9);
+            doc.setTextColor(71, 85, 105);
+            doc.text('Nombre/Razón Social:', 18, 59);
+            doc.text('Identificación:', 110, 59);
+            doc.text('Email:', 18, 68);
+
+            doc.setFont('inter', 'bold');
+            doc.setTextColor(15, 23, 42);
+            doc.text(inv.client, 52, 59);
+            doc.text(inv.doc, 135, 59);
+            doc.setFont('inter', 'normal');
+            doc.text(inv.email, 29, 68);
+
+            const tableRows = inv.items.map(item => [
+                item.sku,
+                item.name,
+                item.qty,
+                `$${item.price.toFixed(2)}`,
+                `$${(item.price * item.qty).toFixed(2)}`
+            ]);
+
+            doc.autoTable({
+                startY: 84,
+                head: [['CÓDIGO', 'DESCRIPCIÓN', 'CANT.', 'P. UNIT', 'TOTAL']],
+                body: tableRows,
+                theme: 'plain',
+                headStyles: { fillColor: [15, 23, 42], textColor: [255, 255, 255], fontStyle: 'bold', fontSize: 9 },
+                bodyStyles: { fontSize: 9, textColor: [51, 65, 85] },
+                columnStyles: {
+                    0: { cellWidth: 28 },
+                    1: { cellWidth: 78 },
+                    2: { cellWidth: 20, halign: 'center' },
+                    3: { cellWidth: 28, halign: 'right' },
+                    4: { cellWidth: 28, halign: 'right' }
+                },
+                margin: { left: 14, right: 14 }
+            });
+
+            const finalY = doc.lastAutoTable.finalY + 10;
+            doc.setFont('inter', 'normal');
+            doc.setFontSize(9);
+            doc.setTextColor(100, 116, 139);
+            doc.text('Subtotal:', 140, finalY);
+            doc.text(`$${inv.subtotal.toFixed(2)}`, 196, finalY, { align: 'right' });
+            doc.text('Impuestos (16% IVA):', 140, finalY + 6);
+            doc.text(`$${inv.tax.toFixed(2)}`, 196, finalY + 6, { align: 'right' });
+            doc.setDrawColor(226, 232, 240);
+            doc.line(130, finalY + 10, 196, finalY + 10);
+            doc.setFont('inter', 'bold');
+            doc.setFontSize(11);
+            doc.setTextColor(15, 23, 42);
+            doc.text('TOTAL A PAGAR:', 140, finalY + 17);
+            doc.setTextColor(79, 70, 229);
+            doc.text(`$${inv.total.toFixed(2)}`, 196, finalY + 17, { align: 'right' });
+
+            doc.save(`${inv.id}.pdf`);
+            showToast('PDF regenerado con éxito');
+        }
+
+        function saveCloudUrl() {
+            const url = document.getElementById('cloud-webhook-url').value.trim();
+            if (!url) return showToast('Ingresa una URL válida', 'error');
+            localStorage.setItem('si_cloud_url', url);
+            cloudWebhook = url;
+            showToast('URL de Google Drive actualizada');
+        }
+
+        function syncWithCloud(type, payload) {
+            if (!cloudWebhook) return;
+            fetch(cloudWebhook, {
                 method: 'POST',
                 mode: 'no-cors',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            }).then(() => {
-                showToast('Factura registrada en Google Sheets');
-            }).catch(err => console.error(err));
-        }
-
-        function updateSyncStatus(text, isConnected) {
-            const dot = document.getElementById('sync-dot');
-            const statusText = document.getElementById('sync-text');
-            statusText.textContent = text;
-            
-            if (isConnected) {
-                dot.className = "w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse";
-            } else {
-                dot.className = "w-2.5 h-2.5 rounded-full bg-amber-500";
-            }
-        }
-
-        // UI Toast Helper
-        function showToast(msg, type = 'success') {
-            const toast = document.getElementById('toast');
-            const icon = document.getElementById('toast-icon');
-            const message = document.getElementById('toast-message');
-
-            message.textContent = msg;
-            if (type === 'error') {
-                icon.className = "fa-solid fa-circle-exclamation text-red-400";
-            } else {
-                icon.className = "fa-solid fa-circle-check text-emerald-400";
-            }
-
-            toast.classList.remove('translate-y-20', 'opacity-0');
-            setTimeout(() => {
-                toast.classList.add('translate-y-20', 'opacity-0');
-            }, 3000);
+                body: JSON.stringify({ type: type, action: 'save', payload: payload })
+            }).catch(err => console.error("Error al sincronizar con la nube:", err));
         }
     </script>
 </body>
