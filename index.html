@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Nubea - Gestión Cloud de Inventario y Facturación</title>
+    <title>Nubea - Gestión Cloud de Inventario, Facturación y Cotizaciones</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts Inter -->
@@ -45,7 +45,11 @@
         </div>
 
         <nav class="flex flex-row md:flex-col p-3 md:p-4 gap-1 overflow-x-auto md:overflow-visible shrink-0 bg-slate-900/90 border-b md:border-b-0 border-slate-800">
-            <button onclick="switchTab('inventory')" id="nav-inventory" class="flex-1 md:flex-none flex items-center justify-center md:justify-start gap-3 px-3 md:px-4 py-2.5 md:py-3 rounded-xl font-medium transition-all text-left bg-indigo-600 text-white shadow-lg shadow-indigo-600/20 text-xs md:text-sm whitespace-nowrap">
+            <button onclick="switchTab('home')" id="nav-home" class="flex-1 md:flex-none flex items-center justify-center md:justify-start gap-3 px-3 md:px-4 py-2.5 md:py-3 rounded-xl font-medium transition-all text-left bg-indigo-600 text-white shadow-lg shadow-indigo-600/20 text-xs md:text-sm whitespace-nowrap">
+                <i data-lucide="home" class="w-4 h-4 md:w-5 md:h-5"></i>
+                <span class="hidden sm:inline">Inicio</span>
+            </button>
+            <button onclick="switchTab('inventory')" id="nav-inventory" class="flex-1 md:flex-none flex items-center justify-center md:justify-start gap-3 px-3 md:px-4 py-2.5 md:py-3 rounded-xl font-medium transition-all text-left text-slate-400 hover:bg-slate-800 hover:text-white text-xs md:text-sm whitespace-nowrap">
                 <i data-lucide="package" class="w-4 h-4 md:w-5 md:h-5"></i>
                 <span class="hidden sm:inline">Inventario</span>
             </button>
@@ -94,7 +98,7 @@
         <!-- Top Header & BCV Rate Banner -->
         <header class="bg-white border-b border-slate-200 px-4 sm:px-6 py-3 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-sm sticky top-0 z-10">
             <div class="flex items-center justify-between w-full sm:w-auto gap-3">
-                <h2 id="header-title" class="text-lg sm:text-xl font-bold text-slate-900 truncate">Gestión de Inventario</h2>
+                <h2 id="header-title" class="text-lg sm:text-xl font-bold text-slate-900 truncate">Panel de Inicio</h2>
                 <button onclick="openLoginModal()" class="md:hidden p-2 bg-slate-100 hover:bg-slate-200 rounded-xl text-slate-700" title="Cambiar Usuario">
                     <i data-lucide="lock" class="w-4 h-4"></i>
                 </button>
@@ -103,11 +107,11 @@
             <div class="flex items-center justify-between sm:justify-center gap-3 bg-indigo-50/70 border border-indigo-100 px-3.5 py-2 rounded-2xl w-full sm:w-auto">
                 <div class="flex items-center gap-2">
                     <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-                    <span class="text-xs font-bold text-indigo-900">Tasa BCV:</span>
+                    <span class="text-xs font-bold text-indigo-900">Tasa BCV del Día:</span>
                 </div>
                 <div class="flex items-center gap-2">
                     <span id="bcv-rate-display" class="text-xs sm:text-sm font-black text-indigo-700">Cargando...</span>
-                    <button onclick="openBcvModal()" id="bcv-edit-btn" class="hidden text-indigo-600 hover:text-indigo-800 p-1 rounded-lg transition" title="Editar Tasa Manualmente">
+                    <button onclick="openBcvModal()" id="bcv-edit-btn" class="text-indigo-600 hover:text-indigo-800 p-1 rounded-lg transition" title="Editar Tasa Manualmente">
                         <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
                     </button>
                 </div>
@@ -123,8 +127,88 @@
             </div>
         </header>
 
+        <!-- View 0: Home / Dashboard Tab -->
+        <div id="view-home" class="p-4 sm:p-6 space-y-6 flex-1">
+            <div class="bg-gradient-to-r from-indigo-900 via-indigo-800 to-slate-900 text-white p-6 sm:p-8 rounded-3xl shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
+                <div class="space-y-2 text-center md:text-left">
+                    <span class="px-3 py-1 bg-indigo-500/30 text-indigo-300 rounded-full text-xs font-semibold uppercase tracking-wider">Sistema Nubea Cloud</span>
+                    <h2 id="welcome-title" class="text-2xl sm:text-3xl font-black tracking-tight">¡Bienvenido al Sistema!</h2>
+                    <p id="welcome-subtitle" class="text-indigo-200 text-sm max-w-xl">Gestiona tu inventario, emite facturas con múltiples métodos de pago, cotizaciones y monitorea tus créditos en tiempo real.</p>
+                </div>
+                <div class="bg-white/10 p-5 rounded-2xl backdrop-blur-sm border border-white/10 text-center shrink-0 w-full md:w-auto">
+                    <div class="text-xs text-indigo-200 font-medium">Estado del Sistema</div>
+                    <div class="text-lg font-bold text-emerald-400 flex items-center justify-center gap-2 mt-1">
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span> En Línea
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ventas del Día -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Ventas del Día ($)</p>
+                        <h3 id="dash-today-sales" class="text-xl sm:text-2xl font-bold text-slate-900 mt-1">$0.00</h3>
+                    </div>
+                    <div class="bg-emerald-50 p-3 rounded-xl text-emerald-600">
+                        <i data-lucide="dollar-sign" class="w-6 h-6"></i>
+                    </div>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Ventas del Día (Bs.)</p>
+                        <h3 id="dash-today-sales-bs" class="text-lg sm:text-xl font-bold text-slate-900 mt-1">Bs. 0.00</h3>
+                    </div>
+                    <div class="bg-indigo-50 p-3 rounded-xl text-indigo-600">
+                        <i data-lucide="trending-up" class="w-6 h-6"></i>
+                    </div>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Facturas Crédito Pendientes</p>
+                        <h3 id="dash-credit-count" class="text-xl sm:text-2xl font-bold text-amber-600 mt-1">0</h3>
+                    </div>
+                    <div class="bg-amber-50 p-3 rounded-xl text-amber-600">
+                        <i data-lucide="clock" class="w-6 h-6"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Monitoreo de Facturas a Crédito -->
+            <div class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                <div class="flex items-center justify-between border-b pb-3">
+                    <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
+                        <i data-lucide="credit-card" class="w-5 h-5 text-indigo-600"></i>
+                        Monitoreo de Facturas a Crédito
+                    </h3>
+                    <button onclick="switchTab('history')" class="text-xs text-indigo-600 hover:text-indigo-800 font-semibold flex items-center gap-1">
+                        Ver Historial Completo <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                    </button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse min-w-[600px]">
+                        <thead>
+                            <tr class="bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase">
+                                <th class="p-3">Nº Factura</th>
+                                <th class="p-3">Fecha</th>
+                                <th class="p-3">Cliente</th>
+                                <th class="p-3">Plazo Crédito</th>
+                                <th class="p-3 text-right">Total</th>
+                                <th class="p-3 text-center">Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dash-credit-table-body" class="divide-y divide-slate-100 text-sm">
+                        </tbody>
+                    </table>
+                </div>
+                <div id="dash-empty-credit" class="hidden py-8 text-center text-slate-400 text-xs">
+                    No hay facturas a crédito pendientes o registradas.
+                </div>
+            </div>
+        </div>
+
         <!-- View 1: Inventory Tab -->
-        <div id="view-inventory" class="p-4 sm:p-6 space-y-6 flex-1">
+        <div id="view-inventory" class="p-4 sm:p-6 space-y-6 flex-1 hidden">
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
                 <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
                     <div>
@@ -243,10 +327,29 @@
                                 <input type="text" id="inv-client-doc" placeholder="Ej. V-12345678" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none">
                             </div>
                             <div>
-                                <label class="block text-xs font-semibold text-slate-600 mb-1">Correo Electrónico</label>
-                                <input type="email" id="inv-client-email" placeholder="cliente@correo.com" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none">
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Dirección</label>
+                                <input type="text" id="inv-client-address" placeholder="Ej. Av. Principal..." class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none">
                             </div>
                             <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Número de Celular</label>
+                                <input type="text" id="inv-client-phone" placeholder="Ej. 0412-1234567" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Método de Pago</label>
+                                <select id="inv-payment-method" onchange="onPaymentMethodChange()" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:outline-none">
+                                    <option value="Efectivo USD">Efectivo USD</option>
+                                    <option value="Zelle">Zelle</option>
+                                    <option value="Transferencia Bancaria">Transferencia Bancaria</option>
+                                    <option value="Pago Móvil">Pago Móvil</option>
+                                    <option value="Efectivo Bs">Efectivo Bs</option>
+                                    <option value="Crédito">Crédito</option>
+                                </select>
+                            </div>
+                            <div id="credit-days-container" class="hidden">
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Días Disponibles para Crédito</label>
+                                <input type="number" id="inv-credit-days" value="30" min="1" placeholder="Ej. 30" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none">
+                            </div>
+                            <div class="sm:col-span-2">
                                 <label class="block text-xs font-semibold text-slate-600 mb-1">Número de Factura</label>
                                 <input type="text" id="inv-number" readonly class="w-full px-3.5 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-sm font-bold text-indigo-600">
                             </div>
@@ -342,7 +445,7 @@
                 <div class="lg:col-span-2 space-y-6">
                     <div class="bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
                         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b pb-3">
-                            <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
+                            <h3 id="quote-form-header" class="font-bold text-slate-900 text-base flex items-center gap-2">
                                 <i data-lucide="calculator" class="w-5 h-5 text-indigo-600"></i>
                                 Emitir Nueva Cotización / Presupuesto
                             </h3>
@@ -351,6 +454,7 @@
                             </button>
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <input type="hidden" id="editing-quote-id">
                             <div>
                                 <label class="block text-xs font-semibold text-slate-600 mb-1">Nombre del Cliente / Empresa</label>
                                 <input type="text" id="quote-client-name" placeholder="Ej. Cliente Solicitante" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none">
@@ -360,10 +464,14 @@
                                 <input type="text" id="quote-client-doc" placeholder="Ej. V-12345678" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none">
                             </div>
                             <div>
-                                <label class="block text-xs font-semibold text-slate-600 mb-1">Correo Electrónico</label>
-                                <input type="email" id="quote-client-email" placeholder="cliente@correo.com" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none">
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Dirección</label>
+                                <input type="text" id="quote-client-address" placeholder="Ej. Av. Principal..." class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none">
                             </div>
                             <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Número de Celular</label>
+                                <input type="text" id="quote-client-phone" placeholder="Ej. 0412-1234567" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none">
+                            </div>
+                            <div class="sm:col-span-2">
                                 <label class="block text-xs font-semibold text-slate-600 mb-1">Nº Cotización</label>
                                 <input type="text" id="quote-number" readonly class="w-full px-3.5 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-sm font-bold text-indigo-600">
                             </div>
@@ -487,7 +595,7 @@
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b pb-4">
                     <div>
                         <h3 class="font-bold text-slate-900 text-base sm:text-lg">Historial de Facturas Emitidas</h3>
-                        <p class="text-xs text-slate-500">Consulta tus facturas emitidas, descarga de nuevo el PDF o procesa devoluciones.</p>
+                        <p class="text-xs text-slate-500">Toca cualquier factura para ver los detalles completos, duplicarla o descargar el PDF.</p>
                     </div>
                     <div class="relative w-full sm:w-64">
                         <i data-lucide="search" class="absolute left-3 top-2.5 w-4 h-4 text-slate-400"></i>
@@ -502,6 +610,7 @@
                                 <th class="p-4">Nº Factura</th>
                                 <th class="p-4">Fecha</th>
                                 <th class="p-4">Cliente</th>
+                                <th class="p-4">Método / Plazo</th>
                                 <th class="p-4">Total</th>
                                 <th class="p-4">Estado</th>
                                 <th class="p-4 text-right">Acciones</th>
@@ -546,6 +655,186 @@
         </div>
 
     </main>
+
+    <!-- Modal: Visor Completo de Detalles de Factura (Cualquier Factura) -->
+    <div id="general-invoice-detail-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl max-w-xl w-full p-6 shadow-2xl space-y-5 border border-slate-100 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <div class="flex items-center gap-2">
+                    <div class="p-2 bg-indigo-50 text-indigo-600 rounded-xl">
+                        <i data-lucide="receipt" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h3 id="gen-inv-modal-id" class="font-bold text-slate-900 text-base">Factura FAC-0000</h3>
+                        <p id="gen-inv-modal-date" class="text-xs text-slate-500">Fecha: --/--/----</p>
+                    </div>
+                </div>
+                <button onclick="closeGeneralInvoiceModal()" class="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Datos del Cliente & Pago -->
+            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 text-xs space-y-2">
+                <div class="flex justify-between">
+                    <span class="text-slate-500">Cliente:</span>
+                    <span id="gen-inv-modal-client" class="font-bold text-slate-900">--</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-slate-500">Doc / RIF:</span>
+                    <span id="gen-inv-modal-doc" class="font-semibold text-slate-700">--</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-slate-500">Teléfono:</span>
+                    <span id="gen-inv-modal-phone" class="text-slate-700">--</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-slate-500">Método de Pago:</span>
+                    <span id="gen-inv-modal-payment" class="font-semibold text-indigo-600">--</span>
+                </div>
+            </div>
+
+            <!-- Resumen Financiero -->
+            <div class="grid grid-cols-3 gap-3 text-center">
+                <div class="bg-slate-100 p-3 rounded-xl">
+                    <p class="text-[10px] font-semibold text-slate-500 uppercase">Subtotal</p>
+                    <p id="gen-inv-modal-subtotal" class="text-sm font-bold text-slate-900">$0.00</p>
+                </div>
+                <div class="bg-slate-100 p-3 rounded-xl">
+                    <p class="text-[10px] font-semibold text-slate-500 uppercase">IVA</p>
+                    <p id="gen-inv-modal-tax" class="text-sm font-bold text-slate-900">$0.00</p>
+                </div>
+                <div class="bg-indigo-50 p-3 rounded-xl">
+                    <p class="text-[10px] font-semibold text-indigo-600 uppercase">Total A Pagar</p>
+                    <p id="gen-inv-modal-total" class="text-sm font-bold text-indigo-700">$0.00</p>
+                    <p id="gen-inv-modal-total-bs" class="text-[10px] text-indigo-600">Bs. 0.00</p>
+                </div>
+            </div>
+
+            <!-- Detalle de Productos -->
+            <div>
+                <p class="text-xs font-bold text-slate-700 mb-2">Productos Facturados:</p>
+                <div class="border rounded-xl overflow-hidden max-h-40 overflow-y-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-slate-100 text-slate-600 font-semibold">
+                            <tr>
+                                <th class="p-2">Producto</th>
+                                <th class="p-2 text-center">Cant</th>
+                                <th class="p-2 text-right">Precio Unit.</th>
+                                <th class="p-2 text-right">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody id="gen-inv-modal-items-body" class="divide-y divide-slate-100">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Acciones -->
+            <div class="border-t pt-4 flex flex-col sm:flex-row gap-2">
+                <input type="hidden" id="gen-inv-modal-active-id">
+                <button onclick="duplicateInvoiceFromModal()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl shadow transition text-xs flex items-center justify-center gap-2">
+                    <i data-lucide="copy" class="w-4 h-4"></i> Duplicar Factura
+                </button>
+                <button onclick="downloadPdfFromGeneralModal()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl shadow transition text-xs flex items-center justify-center gap-2">
+                    <i data-lucide="download" class="w-4 h-4"></i> Descargar PDF
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Detalles y Acciones de Cotización (Ver, Editar, Duplicar, Convertir) -->
+    <div id="quote-detail-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl max-w-xl w-full p-6 shadow-2xl space-y-5 border border-slate-100 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <div class="flex items-center gap-2">
+                    <div class="p-2 bg-indigo-50 text-indigo-600 rounded-xl">
+                        <i data-lucide="calculator" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h3 id="quote-modal-id" class="font-bold text-slate-900 text-base">Cotización COT-0000</h3>
+                        <p id="quote-modal-date" class="text-xs text-slate-500">Fecha: --/--/----</p>
+                    </div>
+                </div>
+                <button onclick="closeQuoteDetailModal()" class="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Datos del Cliente -->
+            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 text-xs space-y-2">
+                <div class="flex justify-between">
+                    <span class="text-slate-500">Cliente:</span>
+                    <span id="quote-modal-client" class="font-bold text-slate-900">--</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-slate-500">Doc / RIF:</span>
+                    <span id="quote-modal-doc" class="font-semibold text-slate-700">--</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-slate-500">Teléfono:</span>
+                    <span id="quote-modal-phone" class="text-slate-700">--</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-slate-500">Estado:</span>
+                    <span id="quote-modal-status" class="font-semibold text-indigo-600">--</span>
+                </div>
+            </div>
+
+            <!-- Resumen Financiero -->
+            <div class="grid grid-cols-3 gap-3 text-center">
+                <div class="bg-slate-100 p-3 rounded-xl">
+                    <p class="text-[10px] font-semibold text-slate-500 uppercase">Subtotal</p>
+                    <p id="quote-modal-subtotal" class="text-sm font-bold text-slate-900">$0.00</p>
+                </div>
+                <div class="bg-slate-100 p-3 rounded-xl">
+                    <p class="text-[10px] font-semibold text-slate-500 uppercase">IVA</p>
+                    <p id="quote-modal-tax" class="text-sm font-bold text-slate-900">$0.00</p>
+                </div>
+                <div class="bg-indigo-50 p-3 rounded-xl">
+                    <p class="text-[10px] font-semibold text-indigo-600 uppercase">Total Estimado</p>
+                    <p id="quote-modal-total" class="text-sm font-bold text-indigo-700">$0.00</p>
+                    <p id="quote-modal-total-bs" class="text-[10px] text-indigo-600">Bs. 0.00</p>
+                </div>
+            </div>
+
+            <!-- Detalle de Productos -->
+            <div>
+                <p class="text-xs font-bold text-slate-700 mb-2">Productos Cotizados:</p>
+                <div class="border rounded-xl overflow-hidden max-h-40 overflow-y-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-slate-100 text-slate-600 font-semibold">
+                            <tr>
+                                <th class="p-2">Producto</th>
+                                <th class="p-2 text-center">Cant</th>
+                                <th class="p-2 text-right">Precio Unit.</th>
+                                <th class="p-2 text-right">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody id="quote-modal-items-body" class="divide-y divide-slate-100">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Acciones -->
+            <div class="border-t pt-4 grid grid-cols-2 sm:grid-cols-4 gap-2">
+                <input type="hidden" id="quote-modal-active-id">
+                <button onclick="editQuoteFromModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl shadow transition text-xs flex items-center justify-center gap-1.5">
+                    <i data-lucide="edit-3" class="w-4 h-4"></i> Editar
+                </button>
+                <button onclick="duplicateQuoteFromModal()" class="bg-violet-600 hover:bg-violet-700 text-white font-bold py-2.5 rounded-xl shadow transition text-xs flex items-center justify-center gap-1.5">
+                    <i data-lucide="copy" class="w-4 h-4"></i> Duplicar
+                </button>
+                <button onclick="convertQuoteToInvoiceFromModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl shadow transition text-xs flex items-center justify-center gap-1.5">
+                    <i data-lucide="receipt" class="w-4 h-4"></i> A Factura
+                </button>
+                <button onclick="downloadQuotePdfFromModal()" class="bg-slate-700 hover:bg-slate-800 text-white font-bold py-2.5 rounded-xl shadow transition text-xs flex items-center justify-center gap-1.5">
+                    <i data-lucide="download" class="w-4 h-4"></i> PDF
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- Modal: Gestión de Familias -->
     <div id="family-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
@@ -600,7 +889,7 @@
         </div>
     </div>
 
-    <!-- Modal: Modificar Tasa BCV Manualmente (Admin) -->
+    <!-- Modal: Modificar Tasa BCV Manualmente -->
     <div id="bcv-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl space-y-5 border border-slate-100">
             <div class="flex justify-between items-center border-b border-slate-100 pb-3">
@@ -641,7 +930,12 @@
                 </div>
                 <button onclick="verifyLogin()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl shadow-lg transition text-sm">Acceder al Sistema</button>
             </div>
-            
+            <div class="text-[11px] text-slate-400 text-center space-y-1 bg-slate-50 p-3 rounded-xl border">
+                <p><b>Claves de Acceso:</b></p>
+                <p>• Admin: <code class="text-indigo-600 font-semibold">admin2026</code></p>
+                <p>• Suministros Eléctricos Ariza: <code class="text-indigo-600 font-semibold">ariza123</code></p>
+                <p>• Los Llanos Lubricantes: <code class="text-indigo-600 font-semibold">llanos123</code></p>
+            </div>
         </div>
     </div>
 
@@ -670,6 +964,131 @@
                     <input type="password" id="confirm-password-input" placeholder="••••••••" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none">
                 </div>
                 <button onclick="updatePassword()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl shadow-lg transition text-sm mt-2">Guardar Nueva Contraseña</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Detalles de Factura a Crédito y Cobro / Abono -->
+    <div id="credit-detail-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl max-w-xl w-full p-6 shadow-2xl space-y-5 border border-slate-100 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <div class="flex items-center gap-2">
+                    <div class="p-2 bg-indigo-50 text-indigo-600 rounded-xl">
+                        <i data-lucide="receipt" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h3 id="credit-modal-inv-id" class="font-bold text-slate-900 text-base">Factura FAC-0000</h3>
+                        <p id="credit-modal-inv-date" class="text-xs text-slate-500">Fecha de emisión: --/--/----</p>
+                    </div>
+                </div>
+                <button onclick="closeCreditDetailModal()" class="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Datos del Cliente -->
+            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 text-xs space-y-2">
+                <div class="flex justify-between">
+                    <span class="text-slate-500">Cliente:</span>
+                    <span id="credit-modal-client-name" class="font-bold text-slate-900">--</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-slate-500">Doc / RIF:</span>
+                    <span id="credit-modal-client-doc" class="font-semibold text-slate-700">--</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-slate-500">Teléfono:</span>
+                    <span id="credit-modal-client-phone" class="text-slate-700">--</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-slate-500">Plazo Acordado:</span>
+                    <span id="credit-modal-credit-days" class="font-semibold text-indigo-600">30 Días</span>
+                </div>
+            </div>
+
+            <!-- Resumen Financiero -->
+            <div class="grid grid-cols-3 gap-3 text-center">
+                <div class="bg-slate-100 p-3 rounded-xl">
+                    <p class="text-[10px] font-semibold text-slate-500 uppercase">Monto Total</p>
+                    <p id="credit-modal-total" class="text-sm font-bold text-slate-900">$0.00</p>
+                    <p id="credit-modal-total-bs" class="text-[10px] text-slate-400">Bs. 0.00</p>
+                </div>
+                <div class="bg-emerald-50 p-3 rounded-xl">
+                    <p class="text-[10px] font-semibold text-emerald-600 uppercase">Abonado</p>
+                    <p id="credit-modal-paid" class="text-sm font-bold text-emerald-700">$0.00</p>
+                    <p id="credit-modal-paid-bs" class="text-[10px] text-emerald-600">Bs. 0.00</p>
+                </div>
+                <div class="bg-rose-50 p-3 rounded-xl">
+                    <p class="text-[10px] font-semibold text-rose-600 uppercase">Saldo Pendiente</p>
+                    <p id="credit-modal-balance" class="text-sm font-bold text-rose-700">$0.00</p>
+                    <p id="credit-modal-balance-bs" class="text-[10px] text-rose-600">Bs. 0.00</p>
+                </div>
+            </div>
+
+            <!-- Detalle de Productos -->
+            <div>
+                <p class="text-xs font-bold text-slate-700 mb-2">Detalle de Productos Facturados:</p>
+                <div class="border rounded-xl overflow-hidden max-h-40 overflow-y-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-slate-100 text-slate-600 font-semibold">
+                            <tr>
+                                <th class="p-2">Producto</th>
+                                <th class="p-2 text-center">Cant</th>
+                                <th class="p-2 text-right">Precio Unit.</th>
+                                <th class="p-2 text-right">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody id="credit-modal-items-body" class="divide-y divide-slate-100">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Acciones de Cobro y Abono -->
+            <div id="credit-modal-actions" class="border-t pt-4 space-y-3">
+                <input type="hidden" id="credit-modal-active-id">
+                
+                <button onclick="processFullPayment()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl shadow-lg transition text-xs flex items-center justify-center gap-2">
+                    <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+                    Cobro Total de Factura (Pagar Monto Completo)
+                </button>
+
+                <div class="p-3 bg-indigo-50/70 border border-indigo-100 rounded-2xl space-y-2">
+                    <label class="block text-xs font-bold text-indigo-900">Registrar Abono Parcial ($):</label>
+                    <div class="flex gap-2">
+                        <input type="number" step="0.01" id="credit-abono-input" placeholder="Monto a abonar..." class="flex-1 px-3 py-2 bg-white border border-indigo-200 rounded-xl text-xs font-bold focus:outline-none">
+                        <button onclick="processPartialPayment()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-4 py-2 rounded-xl text-xs shadow transition">Abonar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Alerta: Cliente con Facturas Pendientes -->
+    <div id="client-pending-alert-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4 border border-slate-100">
+            <div class="flex items-center gap-3 border-b border-slate-100 pb-3">
+                <div class="p-2.5 bg-amber-100 text-amber-700 rounded-2xl">
+                    <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-slate-900 text-base">¡Cliente con Facturas Pendientes!</h3>
+                    <p class="text-xs text-slate-500">Recordatorio de crédito activo</p>
+                </div>
+            </div>
+
+            <div class="space-y-2 text-xs text-slate-700">
+                <p>El cliente <b id="alert-client-name" class="text-indigo-600">--</b> tiene deudas/facturas a crédito pendientes por un total de:</p>
+                <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl text-center">
+                    <div id="alert-client-total-usd" class="text-lg font-black text-amber-700">$0.00</div>
+                    <div id="alert-client-total-bs" class="text-xs font-bold text-amber-600">Bs. 0.00</div>
+                </div>
+                <div class="border rounded-xl p-2 max-h-32 overflow-y-auto space-y-1 bg-slate-50" id="alert-client-invoices-list">
+                </div>
+            </div>
+
+            <div class="pt-2 flex justify-end">
+                <button onclick="closePendingCreditAlert()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl shadow transition text-xs">Entendido / Continuar Facturación</button>
             </div>
         </div>
     </div>
@@ -760,20 +1179,20 @@
             "admin2026": {
                 role: "admin",
                 idKey: "admin",
-                name: "Administrador General",
+                name: "Administrador General Yorfran",
                 businessName: "NUBEA - ADMINISTRACIÓN CENTRAL",
-                rif: "J-00000000-0",
+                rif: "V-30.638.543",
                 address: "Acarigua, Estado Portuguesa",
-                phone: "+58 412-0000000"
+                phone: "+58 422-0808261"
             },
             "ariza123": {
                 role: "client",
                 idKey: "ariza",
                 name: "Suministros Eléctricos Ariza",
                 businessName: "SUMINISTROS ELECTRICOS ARIZA",
-                rif: "J-31234567-8",
-                address: "Av. Circunvalación Sur, Acarigua, Portuguesa",
-                phone: "+58 412-1234567"
+                rif: "J508720075",
+                address: "AV CIRCUNVALACION SUR CASA NRO 39-25F BARRIO FE Y ALEGRIA ACARIGUA PORTUGUESA",
+                phone: "0414-5613691"
             },
             "llanos123": {
                 role: "client",
@@ -781,12 +1200,11 @@
                 name: "Los Llanos Lubricantes",
                 businessName: "LOS LLANOS LUBRICANTES Y ACCESORIOS",
                 rif: "J-40123456-9",
-                address: "Avenida Principal Las Acacias, Acarigua",
+                address: "Avenida 36 con calle 37 Sector Bella Vista Acarigua",
                 phone: "+58 414-7654321"
             }
         };
 
-        // Cargar sesión persistente de localStorage; si no existe, se mantiene en null para pedir login inicial
         let currentUser = JSON.parse(localStorage.getItem('si_current_user')) || null;
         let bcvRate = parseFloat(localStorage.getItem('si_bcv_rate')) || 893.22;
 
@@ -814,6 +1232,46 @@
         let targetDirectoryContext = 'invoice';
 
         window.onload = function() {
+            const defaultDb = {
+                "admin2026": {
+                    role: "admin",
+                    idKey: "admin",
+                    name: "Administrador General",
+                    businessName: "NUBEA - ADMINISTRACIÓN CENTRAL",
+                    rif: "J-00000000-0",
+                    address: "Acarigua, Estado Portuguesa",
+                    phone: "+58 412-0000000"
+                },
+                "ariza123": {
+                    role: "client",
+                    idKey: "ariza",
+                    name: "Suministros Eléctricos Ariza",
+                    businessName: "SUMINISTROS ELECTRICOS ARIZA",
+                    rif: "J508720075",
+                    address: "AV CIRCUNVALACION SUR CASA NRO 39-25F BARRIO FE Y ALEGRIA ACARIGUA PORTUGUESA",
+                    phone: "0414-5613691"
+                },
+                "llanos123": {
+                    role: "client",
+                    idKey: "llanos",
+                    name: "Los Llanos Lubricantes",
+                    businessName: "LOS LLANOS LUBRICANTES Y ACCESORIOS",
+                    rif: "J-40123456-9",
+                    address: "Avenida 36 con calle 37 Sector Bella Vista Acarigua",
+                    phone: "+58 414-7654321"
+                }
+            };
+
+            let storedUsers = JSON.parse(localStorage.getItem('si_users_db')) || {};
+            USERS_DB = { ...defaultDb, ...storedUsers };
+            localStorage.setItem('si_users_db', JSON.stringify(USERS_DB));
+
+            let curr = JSON.parse(localStorage.getItem('si_current_user'));
+            if (curr && curr.currentPasswordKey && USERS_DB[curr.currentPasswordKey]) {
+                currentUser = { ...USERS_DB[curr.currentPasswordKey], currentPasswordKey: curr.currentPasswordKey };
+                localStorage.setItem('si_current_user', JSON.stringify(currentUser));
+            }
+
             lucide.createIcons();
             updateDate();
             fetchAutomaticBcvRate();
@@ -825,6 +1283,7 @@
             renderCheckerResults();
             renderHistory();
             renderQuotesHistory();
+            renderDashboard();
             
             if (currentUser) {
                 updateAuthUI();
@@ -845,7 +1304,16 @@
         };
 
         function fetchAutomaticBcvRate() {
-            document.getElementById('bcv-rate-display').innerText = `Bs. ${bcvRate.toFixed(2)} (Sincronizando...)`;
+            const todayStr = new Date().toDateString();
+            const lastFetchedDate = localStorage.getItem('si_bcv_date');
+            
+            if (lastFetchedDate === todayStr && localStorage.getItem('si_bcv_rate')) {
+                bcvRate = parseFloat(localStorage.getItem('si_bcv_rate'));
+                updateBcvDisplay();
+                return;
+            }
+
+            document.getElementById('bcv-rate-display').innerText = `Bs. ${bcvRate.toFixed(2)} (Actualizando...)`;
             fetch('https://ve.dolarapi.com/v1/dolares/bcv')
                 .then(response => response.json())
                 .then(data => {
@@ -855,15 +1323,17 @@
                         bcvRate = data.precio;
                     }
                     localStorage.setItem('si_bcv_rate', bcvRate);
+                    localStorage.setItem('si_bcv_date', todayStr);
                     updateBcvDisplay();
                     renderInventory();
                     updateInventoryStats();
                     renderCart();
                     renderQuoteCart();
                     renderCheckerResults();
+                    showToast('Tasa BCV actualizada automáticamente del día');
                 })
                 .catch(err => {
-                    console.warn("Usando tasa respaldo guardada:", err);
+                    console.warn("No se pudo conectar a la API BCV, usando tasa guardada:", err);
                     updateBcvDisplay();
                 });
         }
@@ -893,6 +1363,7 @@
             if (!val || val <= 0) return showToast('Ingresa una tasa válida', 'error');
             bcvRate = val;
             localStorage.setItem('si_bcv_rate', bcvRate);
+            localStorage.setItem('si_bcv_date', new Date().toDateString());
             updateBcvDisplay();
             closeBcvModal();
             renderInventory();
@@ -900,7 +1371,8 @@
             renderCart();
             renderQuoteCart();
             renderCheckerResults();
-            showToast('Tasa BCV actualizada manualmente');
+            renderDashboard();
+            showToast('Tasa BCV actualizada correctamente');
         }
 
         function openLoginModal() {
@@ -924,7 +1396,7 @@
                 localStorage.setItem('si_current_user', JSON.stringify(currentUser));
                 closeLoginModal();
                 updateAuthUI();
-                switchTab('inventory');
+                switchTab('home');
                 showToast(`Bienvenido, ${currentUser.name}`);
             } else {
                 showToast('Contraseña incorrecta', 'error');
@@ -941,7 +1413,6 @@
             }
         }
 
-        // --- Funciones para Cambiar Contraseña ---
         function openPasswordModal() {
             document.getElementById('current-password-input').value = '';
             document.getElementById('new-password-input').value = '';
@@ -978,13 +1449,11 @@
                 return showToast('Esta contraseña ya está en uso por otro usuario', 'error');
             }
 
-            // Actualizar en USERS_DB
             const userData = USERS_DB[currentPass];
             delete USERS_DB[currentPass];
             USERS_DB[newPass] = userData;
             localStorage.setItem('si_users_db', JSON.stringify(USERS_DB));
 
-            // Actualizar sesión actual
             currentUser.currentPasswordKey = newPass;
             localStorage.setItem('si_current_user', JSON.stringify(currentUser));
 
@@ -999,23 +1468,19 @@
             const roleLabel = document.getElementById('user-role-label');
             const navCloud = document.getElementById('nav-cloud');
             const navQuote = document.getElementById('nav-quote');
-            const bcvEditBtn = document.getElementById('bcv-edit-btn');
             const sidebarBusiness = document.getElementById('sidebar-business-name');
             const sidebarRole = document.getElementById('sidebar-role-desc');
+            const welcomeTitle = document.getElementById('welcome-title');
+            const welcomeSubtitle = document.getElementById('welcome-subtitle');
 
             sidebarBusiness.innerText = currentUser.businessName.length > 22 ? currentUser.businessName.substring(0, 20) + '...' : currentUser.businessName;
             sidebarRole.innerText = currentUser.role === 'admin' ? 'Administrador Nubea' : 'Cliente Autorizado';
+            if(welcomeTitle) welcomeTitle.innerText = `¡Bienvenido, ${currentUser.name}!`;
+            if(welcomeSubtitle) welcomeSubtitle.innerText = `Sistema operativo para ${currentUser.businessName}. Gestiona inventarios, facturas y créditos en tiempo real.`;
 
-            if (currentUser.idKey === 'ariza') {
-                if(navQuote) {
-                    navQuote.classList.remove('flex');
-                    navQuote.classList.add('hidden');
-                }
-            } else {
-                if(navQuote) {
-                    navQuote.classList.remove('hidden');
-                    navQuote.classList.add('flex');
-                }
+            if(navQuote) {
+                navQuote.classList.remove('hidden');
+                navQuote.classList.add('flex');
             }
 
             if (currentUser.role === 'admin') {
@@ -1025,7 +1490,6 @@
                 avatar.innerText = "AD";
                 roleLabel.innerText = "Administrador";
                 if(navCloud) { navCloud.classList.remove('hidden'); navCloud.classList.add('flex'); }
-                if(bcvEditBtn) bcvEditBtn.classList.remove('hidden');
             } else {
                 badge.innerText = 'Cliente';
                 badge.className = "px-2 py-0.5 rounded-full text-[10px] bg-indigo-500/20 text-indigo-300 font-medium";
@@ -1033,7 +1497,6 @@
                 avatar.innerText = currentUser.name.substring(0,2).toUpperCase();
                 roleLabel.innerText = currentUser.name;
                 if(navCloud) { navCloud.classList.remove('flex'); navCloud.classList.add('hidden'); }
-                if(bcvEditBtn) bcvEditBtn.classList.add('hidden');
             }
         }
 
@@ -1054,12 +1517,8 @@
 
         function switchTab(tab) {
             if (!currentUser) return openLoginModal();
-            if (tab === 'quote' && currentUser.idKey === 'ariza') {
-                showToast('Acceso no autorizado para Suministros Eléctricos Ariza', 'error');
-                return;
-            }
 
-            const tabs = ['inventory', 'checker', 'invoice', 'quote', 'history'];
+            const tabs = ['home', 'inventory', 'checker', 'invoice', 'quote', 'history'];
             if (currentUser && currentUser.role === 'admin') tabs.push('cloud');
 
             tabs.forEach(t => {
@@ -1073,6 +1532,7 @@
             document.getElementById(`nav-${tab}`).className = "flex-1 md:flex-none flex items-center justify-center md:justify-start gap-3 px-3 md:px-4 py-2.5 md:py-3 rounded-xl font-medium transition-all text-left bg-indigo-600 text-white shadow-lg shadow-indigo-600/20 text-xs md:text-sm whitespace-nowrap";
             
             const titles = {
+                home: 'Panel de Inicio',
                 inventory: 'Gestión de Inventario',
                 checker: 'Consultor de Precios en Vivo',
                 invoice: 'Módulo de Facturación',
@@ -1081,9 +1541,70 @@
                 cloud: 'Guía y Configuración Google Drive'
             };
             document.getElementById('header-title').innerText = titles[tab];
+            if (tab === 'home') renderDashboard();
         }
 
-        // --- Gestión de Familias por el Cliente ---
+        function renderDashboard() {
+            const todayStr = new Date().toLocaleDateString();
+            const todayInvoices = invoices.filter(inv => inv.date === todayStr && !inv.returned);
+            const todaySales = todayInvoices.reduce((acc, inv) => acc + inv.total, 0);
+            const todaySalesBs = todaySales * bcvRate;
+
+            document.getElementById('dash-today-sales').innerText = `$${todaySales.toFixed(2)}`;
+            document.getElementById('dash-today-sales-bs').innerText = `Bs. ${todaySalesBs.toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+
+            const creditInvoices = invoices.filter(inv => inv.paymentMethod === 'Crédito' && !inv.returned && (inv.paymentStatus !== 'Pagada' && (inv.total - (inv.paidAmount || 0)) > 0.009));
+            document.getElementById('dash-credit-count').innerText = creditInvoices.length;
+
+            const tbody = document.getElementById('dash-credit-table-body');
+            const emptyEl = document.getElementById('dash-empty-credit');
+            if(!tbody) return;
+            tbody.innerHTML = '';
+
+            if (creditInvoices.length === 0) {
+                emptyEl.classList.remove('hidden');
+                return;
+            }
+            emptyEl.classList.add('hidden');
+
+            creditInvoices.slice().reverse().forEach(inv => {
+                const paid = inv.paidAmount || 0;
+                const balance = inv.total - paid;
+                const balanceBs = balance * bcvRate;
+                const statusLabel = paid > 0 ? `Abonada ($${balance.toFixed(2)} pend.)` : 'Pendiente';
+                const statusBg = paid > 0 ? 'bg-indigo-100 text-indigo-700' : 'bg-amber-100 text-amber-700';
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-indigo-50/50 cursor-pointer transition-colors";
+                tr.onclick = function() { openCreditDetailModal(inv.id); };
+                tr.innerHTML = `
+                    <td class="p-3 font-mono font-semibold text-indigo-600 text-xs">${inv.id}</td>
+                    <td class="p-3 text-slate-600 text-xs">${inv.date}</td>
+                    <td class="p-3 font-medium text-slate-900 text-xs">${inv.client}</td>
+                    <td class="p-3 text-slate-600 text-xs font-semibold text-indigo-700">${inv.creditDays || 30} Días Plazo</td>
+                    <td class="p-3 text-right text-xs">
+                        <div class="font-bold text-slate-900">$${balance.toFixed(2)}</div>
+                        <div class="text-[10px] text-slate-400">Total: $${inv.total.toFixed(2)}</div>
+                    </td>
+                    <td class="p-3 text-center">
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold ${statusBg}">${statusLabel}</span>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            lucide.createIcons();
+        }
+
+        function onPaymentMethodChange() {
+            const method = document.getElementById('inv-payment-method').value;
+            const container = document.getElementById('credit-days-container');
+            if (method === 'Crédito') {
+                container.classList.remove('hidden');
+            } else {
+                container.classList.add('hidden');
+            }
+        }
+
         function openFamilyModal() {
             renderFamilyList();
             document.getElementById('family-modal').classList.remove('hidden');
@@ -1147,7 +1668,6 @@
             select.innerHTML = families.map(f => `<option value="${f.code}">${f.name} (${f.code})</option>`).join('');
         }
 
-        // --- Consultor de Precios Tab ---
         function renderCheckerResults(filterQuery = '') {
             const container = document.getElementById('checker-results-container');
             if(!container) return;
@@ -1188,7 +1708,6 @@
             renderCheckerResults(q);
         }
 
-        // --- SKU Automático ---
         function generateAutoSku(family) {
             const familyItems = inventory.filter(p => p.family === family);
             const nextNum = familyItems.length + 1;
@@ -1213,7 +1732,6 @@
             document.getElementById('prod-calc-price-display').value = `$${finalPrice.toFixed(2)}`;
         }
 
-        // --- Buscador Desplegable en Facturación y Cotizaciones ---
         function openProductDropdown(type) {
             const listId = type === 'invoice' ? 'invoice-dropdown-list' : 'quote-dropdown-list';
             document.getElementById(listId).classList.remove('hidden');
@@ -1263,7 +1781,6 @@
             document.getElementById(listId).classList.add('hidden');
         }
 
-        // --- Directorio de Clientes ---
         function openClientDirectoryModal(context = 'invoice') {
             targetDirectoryContext = context;
             renderClientDirectory(clients);
@@ -1289,9 +1806,9 @@
                 div.innerHTML = `
                     <div>
                         <p class="font-bold text-slate-900 text-sm">${c.name}</p>
-                        <p class="text-xs text-slate-500">Doc: ${c.doc} | Correo: ${c.email}</p>
+                        <p class="text-xs text-slate-500">Doc: ${c.doc} | Dir: ${c.address || 'N/A'} | Cel: ${c.phone || 'N/A'}</p>
                     </div>
-                    <button onclick="selectClient('${c.name}', '${c.doc}', '${c.email}')" class="px-3 py-1.5 bg-indigo-600 text-white rounded-lg text-xs font-semibold hover:bg-indigo-700 w-full sm:w-auto text-center">Seleccionar</button>
+                    <button onclick="selectClient('${c.name}', '${c.doc}', '${c.address || ''}', '${c.phone || ''}')" class="px-3 py-1.5 bg-indigo-600 text-white rounded-lg text-xs font-semibold hover:bg-indigo-700 w-full sm:w-auto text-center">Seleccionar</button>
                 `;
                 listContainer.appendChild(div);
             });
@@ -1300,25 +1817,27 @@
 
         function filterClientDirectory() {
             const query = document.getElementById('search-client-dir').value.toLowerCase();
-            const filtered = clients.filter(c => c.name.toLowerCase().includes(query) || c.doc.toLowerCase().includes(query) || c.email.toLowerCase().includes(query));
+            const filtered = clients.filter(c => c.name.toLowerCase().includes(query) || c.doc.toLowerCase().includes(query) || (c.address && c.address.toLowerCase().includes(query)));
             renderClientDirectory(filtered);
         }
 
-        function selectClient(name, doc, email) {
+        function selectClient(name, doc, address, phone) {
             if (targetDirectoryContext === 'quote') {
                 document.getElementById('quote-client-name').value = name;
                 document.getElementById('quote-client-doc').value = doc;
-                document.getElementById('quote-client-email').value = email;
+                document.getElementById('quote-client-address').value = address;
+                document.getElementById('quote-client-phone').value = phone;
             } else {
                 document.getElementById('inv-client-name').value = name;
                 document.getElementById('inv-client-doc').value = doc;
-                document.getElementById('inv-client-email').value = email;
+                document.getElementById('inv-client-address').value = address;
+                document.getElementById('inv-client-phone').value = phone;
+                checkClientPendingCredit(doc || name);
             }
             closeClientDirectoryModal();
             showToast('Cliente seleccionado correctamente');
         }
 
-        // --- Inventario & Ajuste de Stock Funcional ---
         function renderInventory(itemsToRender = inventory) {
             const tbody = document.getElementById('inventory-table-body');
             const emptyState = document.getElementById('empty-inventory');
@@ -1496,7 +2015,6 @@
             }
         }
 
-        // --- Facturación ---
         function initInvoiceNumber() {
             const num = 'FAC-' + String(Math.floor(1000 + Math.random() * 9000));
             document.getElementById('inv-number').value = num;
@@ -1597,14 +2115,14 @@
             currentCart = [];
             document.getElementById('inv-client-name').value = '';
             document.getElementById('inv-client-doc').value = '';
-            document.getElementById('inv-client-email').value = '';
+            document.getElementById('inv-client-address').value = '';
+            document.getElementById('inv-client-phone').value = '';
+            document.getElementById('inv-payment-method').value = 'Efectivo USD';
+            document.getElementById('credit-days-container').classList.add('hidden');
             renderCart();
             showToast('Formulario limpiado');
         }
 
-        // ==========================================
-        // MÓDULO DE COTIZACIONES
-        // ==========================================
         function initQuoteNumber() {
             const num = 'COT-' + String(Math.floor(1000 + Math.random() * 9000));
             const el = document.getElementById('quote-number');
@@ -1697,9 +2215,12 @@
 
         function clearQuoteForm() {
             currentQuoteCart = [];
+            document.getElementById('editing-quote-id').value = '';
             document.getElementById('quote-client-name').value = '';
             document.getElementById('quote-client-doc').value = '';
-            document.getElementById('quote-client-email').value = '';
+            document.getElementById('quote-client-address').value = '';
+            document.getElementById('quote-client-phone').value = '';
+            document.getElementById('quote-form-header').innerHTML = `<i data-lucide="calculator" class="w-5 h-5 text-indigo-600"></i> Emitir Nueva Cotización / Presupuesto`;
             renderQuoteCart();
             initQuoteNumber();
             showToast('Cotización limpiada');
@@ -1709,12 +2230,14 @@
             if (currentQuoteCart.length === 0) return showToast('Agrega productos a la cotización', 'error');
             const clientName = document.getElementById('quote-client-name').value.trim() || 'Cliente Solicitante';
             const clientDoc = document.getElementById('quote-client-doc').value.trim() || 'V-00000000';
-            const clientEmail = document.getElementById('quote-client-email').value.trim() || 'contacto@cliente.com';
+            const clientAddress = document.getElementById('quote-client-address').value.trim() || 'Acarigua';
+            const clientPhone = document.getElementById('quote-client-phone').value.trim() || '0412-0000000';
             const quoteNumber = document.getElementById('quote-number').value;
             const taxRate = parseFloat(document.getElementById('quote-tax-rate').value) || 16;
+            const editingId = document.getElementById('editing-quote-id').value;
 
             if (clientDoc !== 'V-00000000' && !clients.some(c => c.doc === clientDoc)) {
-                clients.push({ id: Date.now().toString(), name: clientName, doc: clientDoc, email: clientEmail });
+                clients.push({ id: Date.now().toString(), name: clientName, doc: clientDoc, address: clientAddress, phone: clientPhone });
                 localStorage.setItem('si_clients', JSON.stringify(clients));
             }
 
@@ -1722,19 +2245,38 @@
             const tax = subtotal * (taxRate / 100);
             const total = subtotal + tax;
 
-            const newQuote = {
-                id: quoteNumber,
-                date: new Date().toLocaleDateString(),
-                client: clientName,
-                doc: clientDoc,
-                email: clientEmail,
-                items: [...currentQuoteCart],
-                subtotal,
-                tax,
-                total,
-                status: 'Emitida'
-            };
-            quotes.push(newQuote);
+            if (editingId) {
+                const q = quotes.find(item => item.id === editingId);
+                if (q) {
+                    q.client = clientName;
+                    q.doc = clientDoc;
+                    q.address = clientAddress;
+                    q.phone = clientPhone;
+                    q.items = [...currentQuoteCart];
+                    q.subtotal = subtotal;
+                    q.tax = tax;
+                    q.total = total;
+                    q.status = 'Modificada';
+                    showToast(`Cotización ${q.id} actualizada con éxito`);
+                }
+            } else {
+                const newQuote = {
+                    id: quoteNumber,
+                    date: new Date().toLocaleDateString(),
+                    client: clientName,
+                    doc: clientDoc,
+                    address: clientAddress,
+                    phone: clientPhone,
+                    items: [...currentQuoteCart],
+                    subtotal,
+                    tax,
+                    total,
+                    status: 'Emitida'
+                };
+                quotes.push(newQuote);
+                showToast('Cotización emitida y guardada');
+            }
+
             localStorage.setItem('si_quotes', JSON.stringify(quotes));
             renderQuotesHistory();
 
@@ -1742,16 +2284,16 @@
             const doc = new jsPDF();
 
             doc.setFont('inter', 'bold');
-            doc.setFontSize(16);
+            doc.setFontSize(14);
             doc.setTextColor(15, 23, 42);
-            doc.text(currentUser.businessName, 14, 18);
+            doc.text(currentUser.businessName, 14, 16);
 
             doc.setFont('inter', 'normal');
-            doc.setFontSize(9);
+            doc.setFontSize(8);
             doc.setTextColor(100, 116, 139);
-            doc.text(`RIF: ${currentUser.rif}`, 14, 24);
-            doc.text(currentUser.address, 14, 29);
-            doc.text(`Teléfono: ${currentUser.phone}`, 14, 34);
+            doc.text(`RIF: ${currentUser.rif}`, 14, 21);
+            doc.text(currentUser.address, 14, 25, { maxWidth: 100 });
+            doc.text(`Teléfono: ${currentUser.phone}`, 14, 33);
 
             doc.setFillColor(238, 242, 255);
             doc.roundedRect(130, 12, 66, 7, 1, 1, 'F');
@@ -1774,28 +2316,30 @@
             doc.line(14, 40, 196, 40);
 
             doc.setFillColor(248, 250, 252);
-            doc.roundedRect(14, 46, 182, 30, 2, 2, 'F');
+            doc.roundedRect(14, 44, 182, 32, 2, 2, 'F');
             doc.setDrawColor(226, 232, 240);
-            doc.roundedRect(14, 46, 182, 30, 2, 2, 'S');
+            doc.roundedRect(14, 44, 182, 32, 2, 2, 'S');
 
             doc.setFont('inter', 'bold');
             doc.setFontSize(8);
             doc.setTextColor(100, 116, 139);
-            doc.text('DIRIGIDO A:', 18, 52);
+            doc.text('DIRIGIDO A:', 18, 50);
 
             doc.setFont('inter', 'normal');
             doc.setFontSize(9);
             doc.setTextColor(71, 85, 105);
-            doc.text('Nombre/Razón Social:', 18, 59);
-            doc.text('Identificación:', 110, 59);
-            doc.text('Email:', 18, 68);
+            doc.text('Nombre:', 18, 57);
+            doc.text('Identificación:', 110, 57);
+            doc.text('Dirección:', 18, 65);
+            doc.text('Celular:', 110, 65);
 
             doc.setFont('inter', 'bold');
             doc.setTextColor(15, 23, 42);
-            doc.text(clientName, 52, 59);
-            doc.text(clientDoc, 135, 59);
+            doc.text(clientName, 35, 57);
+            doc.text(clientDoc, 135, 57);
             doc.setFont('inter', 'normal');
-            doc.text(clientEmail, 29, 68);
+            doc.text(clientAddress, 36, 65, { maxWidth: 70 });
+            doc.text(clientPhone, 125, 65);
 
             const tableRows = currentQuoteCart.map(item => [
                 item.sku,
@@ -1806,7 +2350,7 @@
             ]);
 
             doc.autoTable({
-                startY: 84,
+                startY: 80,
                 head: [['CÓDIGO', 'DESCRIPCIÓN', 'CANT.', 'P. UNIT', 'TOTAL']],
                 body: tableRows,
                 theme: 'plain',
@@ -1843,11 +2387,8 @@
             doc.text(`$${total.toFixed(2)}`, 196, finalY + 17, { align: 'right' });
 
             doc.save(`${quoteNumber}.pdf`);
-            showToast('Cotización emitida y PDF descargado');
 
-            currentQuoteCart = [];
-            renderQuoteCart();
-            initQuoteNumber();
+            clearQuoteForm();
         }
 
         function renderQuotesHistory() {
@@ -1864,7 +2405,11 @@
 
             quotes.slice().reverse().forEach(q => {
                 const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50 transition-colors";
+                tr.className = "hover:bg-slate-50 cursor-pointer transition-colors";
+                tr.onclick = function(e) {
+                    if (e.target.closest('button')) return;
+                    openQuoteDetailModal(q.id);
+                };
                 const totalBs = q.total * bcvRate;
                 const isCancelled = q.status === 'Cancelada';
 
@@ -1882,16 +2427,12 @@
                         </span>
                     </td>
                     <td class="p-3 text-right space-x-1">
-                        <button onclick="reprintQuote('${q.id}')" class="px-2 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-lg text-xs font-semibold inline-flex items-center gap-1" title="Descargar PDF">
+                        <button onclick="openQuoteDetailModal('${q.id}')" class="px-2 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-lg text-xs font-semibold inline-flex items-center gap-1" title="Ver Detalles">
+                            <i data-lucide="eye" class="w-3 h-3"></i>
+                        </button>
+                        <button onclick="reprintQuote('${q.id}')" class="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold inline-flex items-center gap-1" title="Descargar PDF">
                             <i data-lucide="download" class="w-3 h-3"></i>
                         </button>
-                        ${isCancelled ? `
-                            <span class="text-xs text-slate-400 italic">Cancelada</span>
-                        ` : `
-                            <button onclick="cancelQuote('${q.id}')" class="px-2 py-1 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg text-xs font-semibold inline-flex items-center gap-1" title="Cancelar Cotización">
-                                <i data-lucide="x-circle" class="w-3 h-3"></i>
-                            </button>
-                        `}
                     </td>
                 `;
                 tbody.appendChild(tr);
@@ -1918,16 +2459,16 @@
             const doc = new jsPDF();
 
             doc.setFont('inter', 'bold');
-            doc.setFontSize(16);
+            doc.setFontSize(14);
             doc.setTextColor(15, 23, 42);
-            doc.text(currentUser.businessName, 14, 18);
+            doc.text(currentUser.businessName, 14, 16);
 
             doc.setFont('inter', 'normal');
-            doc.setFontSize(9);
+            doc.setFontSize(8);
             doc.setTextColor(100, 116, 139);
-            doc.text(`RIF: ${currentUser.rif}`, 14, 24);
-            doc.text(currentUser.address, 14, 29);
-            doc.text(`Teléfono: ${currentUser.phone}`, 14, 34);
+            doc.text(`RIF: ${currentUser.rif}`, 14, 21);
+            doc.text(currentUser.address, 14, 25, { maxWidth: 100 });
+            doc.text(`Teléfono: ${currentUser.phone}`, 14, 33);
 
             doc.setFillColor(238, 242, 255);
             doc.roundedRect(130, 12, 66, 7, 1, 1, 'F');
@@ -1950,28 +2491,30 @@
             doc.line(14, 40, 196, 40);
 
             doc.setFillColor(248, 250, 252);
-            doc.roundedRect(14, 46, 182, 30, 2, 2, 'F');
+            doc.roundedRect(14, 44, 182, 32, 2, 2, 'F');
             doc.setDrawColor(226, 232, 240);
-            doc.roundedRect(14, 46, 182, 30, 2, 2, 'S');
+            doc.roundedRect(14, 44, 182, 32, 2, 2, 'S');
 
             doc.setFont('inter', 'bold');
             doc.setFontSize(8);
             doc.setTextColor(100, 116, 139);
-            doc.text('DIRIGIDO A:', 18, 52);
+            doc.text('DIRIGIDO A:', 18, 50);
 
             doc.setFont('inter', 'normal');
             doc.setFontSize(9);
             doc.setTextColor(71, 85, 105);
-            doc.text('Nombre/Razón Social:', 18, 59);
-            doc.text('Identificación:', 110, 59);
-            doc.text('Email:', 18, 68);
+            doc.text('Nombre:', 18, 57);
+            doc.text('Identificación:', 110, 57);
+            doc.text('Dirección:', 18, 65);
+            doc.text('Celular:', 110, 65);
 
             doc.setFont('inter', 'bold');
             doc.setTextColor(15, 23, 42);
-            doc.text(q.client, 52, 59);
-            doc.text(q.doc, 135, 59);
+            doc.text(q.client, 35, 57);
+            doc.text(q.doc || 'V-00000000', 135, 57);
             doc.setFont('inter', 'normal');
-            doc.text(q.email, 29, 68);
+            doc.text(q.address || 'N/A', 36, 65, { maxWidth: 70 });
+            doc.text(q.phone || 'N/A', 125, 65);
 
             const tableRows = q.items.map(item => [
                 item.sku,
@@ -1982,7 +2525,7 @@
             ]);
 
             doc.autoTable({
-                startY: 84,
+                startY: 80,
                 head: [['CÓDIGO', 'DESCRIPCIÓN', 'CANT.', 'P. UNIT', 'TOTAL']],
                 body: tableRows,
                 theme: 'plain',
@@ -2019,17 +2562,19 @@
             showToast('PDF de cotización descargado');
         }
 
-        // --- Generación de PDF de Factura ---
         function generatePDF() {
             if (currentCart.length === 0) return showToast('Agrega productos al carrito primero', 'error');
             const clientName = document.getElementById('inv-client-name').value.trim() || '*Empresa Cliente S.A.*';
             const clientDoc = document.getElementById('inv-client-doc').value.trim() || '123456789001';
-            const clientEmail = document.getElementById('inv-client-email').value.trim() || 'contacto@cliente.com';
+            const clientAddress = document.getElementById('inv-client-address').value.trim() || 'Acarigua';
+            const clientPhone = document.getElementById('inv-client-phone').value.trim() || '0412-0000000';
+            const paymentMethod = document.getElementById('inv-payment-method').value;
+            const creditDays = paymentMethod === 'Crédito' ? (document.getElementById('inv-credit-days').value.trim() || '30') : null;
             const invNumber = document.getElementById('inv-number').value;
             const taxRate = parseFloat(document.getElementById('tax-rate').value) || 16;
 
             if (clientDoc !== '123456789001' && !clients.some(c => c.doc === clientDoc)) {
-                const newClient = { id: Date.now().toString(), name: clientName, doc: clientDoc, email: clientEmail };
+                const newClient = { id: Date.now().toString(), name: clientName, doc: clientDoc, address: clientAddress, phone: clientPhone };
                 clients.push(newClient);
                 localStorage.setItem('si_clients', JSON.stringify(clients));
             }
@@ -2049,7 +2594,10 @@
                 date: new Date().toLocaleDateString(),
                 client: clientName,
                 doc: clientDoc,
-                email: clientEmail,
+                address: clientAddress,
+                phone: clientPhone,
+                paymentMethod,
+                creditDays,
                 items: [...currentCart],
                 subtotal,
                 tax,
@@ -2064,16 +2612,16 @@
             const doc = new jsPDF();
 
             doc.setFont('inter', 'bold');
-            doc.setFontSize(16);
+            doc.setFontSize(14);
             doc.setTextColor(15, 23, 42);
-            doc.text(currentUser.businessName, 14, 18);
+            doc.text(currentUser.businessName, 14, 16);
 
             doc.setFont('inter', 'normal');
-            doc.setFontSize(9);
+            doc.setFontSize(8);
             doc.setTextColor(100, 116, 139);
-            doc.text(`RIF: ${currentUser.rif}`, 14, 24);
-            doc.text(currentUser.address, 14, 29);
-            doc.text(`Teléfono: ${currentUser.phone}`, 14, 34);
+            doc.text(`RIF: ${currentUser.rif}`, 14, 21);
+            doc.text(currentUser.address, 14, 25, { maxWidth: 100 });
+            doc.text(`Teléfono: ${currentUser.phone}`, 14, 33);
 
             doc.setFillColor(224, 231, 255);
             doc.roundedRect(140, 12, 56, 7, 1, 1, 'F');
@@ -2096,28 +2644,38 @@
             doc.line(14, 40, 196, 40);
 
             doc.setFillColor(248, 250, 252);
-            doc.roundedRect(14, 46, 182, 30, 2, 2, 'F');
+            doc.roundedRect(14, 44, 182, 38, 2, 2, 'F');
             doc.setDrawColor(226, 232, 240);
-            doc.roundedRect(14, 46, 182, 30, 2, 2, 'S');
+            doc.roundedRect(14, 44, 182, 38, 2, 2, 'S');
 
             doc.setFont('inter', 'bold');
             doc.setFontSize(8);
             doc.setTextColor(100, 116, 139);
-            doc.text('CLIENTE', 18, 52);
+            doc.text('CLIENTE Y PAGO', 18, 50);
 
             doc.setFont('inter', 'normal');
             doc.setFontSize(9);
             doc.setTextColor(71, 85, 105);
-            doc.text('Nombre/Razón Social:', 18, 59);
-            doc.text('Identificación:', 110, 59);
-            doc.text('Email:', 18, 68);
+            doc.text('Nombre:', 18, 57);
+            doc.text('Identificación:', 110, 57);
+            doc.text('Dirección:', 18, 65);
+            doc.text('Celular:', 110, 65);
+            doc.text('Método de Pago:', 18, 73);
+            if (paymentMethod === 'Crédito') {
+                doc.text('Plazo de Crédito:', 110, 73);
+            }
 
             doc.setFont('inter', 'bold');
             doc.setTextColor(15, 23, 42);
-            doc.text(clientName, 52, 59);
-            doc.text(clientDoc, 135, 59);
+            doc.text(clientName, 35, 57);
+            doc.text(clientDoc, 135, 57);
             doc.setFont('inter', 'normal');
-            doc.text(clientEmail, 29, 68);
+            doc.text(clientAddress, 36, 65, { maxWidth: 70 });
+            doc.text(clientPhone, 125, 65);
+            doc.text(paymentMethod, 45, 73);
+            if (paymentMethod === 'Crédito') {
+                doc.text(`${creditDays} Días`, 138, 73);
+            }
 
             const tableRows = currentCart.map(item => [
                 item.sku,
@@ -2128,7 +2686,7 @@
             ]);
 
             doc.autoTable({
-                startY: 84,
+                startY: 86,
                 head: [['CÓDIGO', 'DESCRIPCIÓN', 'CANT.', 'P. UNIT', 'TOTAL']],
                 body: tableRows,
                 theme: 'plain',
@@ -2173,9 +2731,9 @@
             renderInventory();
             renderCheckerResults();
             renderHistory();
+            renderDashboard();
         }
 
-        // --- Historial ---
         function renderHistory() {
             const tbody = document.getElementById('history-table-body');
             const emptyHistory = document.getElementById('empty-history');
@@ -2196,12 +2754,19 @@
 
             filteredInvoices.slice().reverse().forEach(inv => {
                 const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50 transition-colors";
+                tr.className = "hover:bg-slate-50 transition-colors cursor-pointer";
+                tr.onclick = function(e) {
+                    if (e.target.closest('button')) return;
+                    openGeneralInvoiceModal(inv.id);
+                };
                 const totalBs = inv.total * bcvRate;
+                const paymentInfo = inv.paymentMethod === 'Crédito' ? `Crédito (${inv.creditDays || 30}d)` : inv.paymentMethod;
+
                 tr.innerHTML = `
                     <td class="p-4 font-mono font-semibold text-indigo-600 text-xs">${inv.id}</td>
                     <td class="p-4 text-slate-600 text-xs">${inv.date}</td>
                     <td class="p-4 font-medium text-slate-900 text-xs">${inv.client}</td>
+                    <td class="p-4 text-xs font-semibold text-slate-700">${paymentInfo}</td>
                     <td class="p-4 text-xs">
                         <div class="font-semibold text-slate-900">$${inv.total.toFixed(2)}</div>
                         <div class="text-[11px] text-slate-400">Bs. ${totalBs.toFixed(2)}</div>
@@ -2211,9 +2776,12 @@
                             ${inv.returned ? 'Devuelta' : 'Emitida'}
                         </span>
                     </td>
-                    <td class="p-4 text-right space-x-1 sm:space-x-2">
-                        <button onclick="reprintInvoice('${inv.id}')" class="px-2.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-lg text-xs font-semibold transition-all inline-flex items-center gap-1">
-                            <i data-lucide="download" class="w-3.5 h-3.5"></i> PDF
+                    <td class="p-4 text-right space-x-1 sm:space-x-1">
+                        <button onclick="openGeneralInvoiceModal('${inv.id}')" class="px-2.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-lg text-xs font-semibold transition-all inline-flex items-center gap-1" title="Ver Detalles">
+                            <i data-lucide="eye" class="w-3.5 h-3.5"></i>
+                        </button>
+                        <button onclick="reprintInvoice('${inv.id}')" class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold transition-all inline-flex items-center gap-1" title="Descargar PDF">
+                            <i data-lucide="download" class="w-3.5 h-3.5"></i>
                         </button>
                         ${inv.returned ? `
                             <button disabled class="px-2.5 py-1.5 bg-slate-100 text-slate-400 rounded-lg text-xs font-semibold cursor-not-allowed inline-flex items-center gap-1">
@@ -2229,6 +2797,178 @@
                 tbody.appendChild(tr);
             });
             lucide.createIcons();
+        }
+
+        /* --- VISOR GENERAL DE FACTURAS Y DUPLICAR FACTURA --- */
+        function openGeneralInvoiceModal(invId) {
+            const inv = invoices.find(i => i.id === invId);
+            if (!inv) return showToast('Factura no encontrada', 'error');
+
+            document.getElementById('gen-inv-modal-active-id').value = inv.id;
+            document.getElementById('gen-inv-modal-id').innerText = `Factura ${inv.id}`;
+            document.getElementById('gen-inv-modal-date').innerText = `Fecha: ${inv.date}`;
+            document.getElementById('gen-inv-modal-client').innerText = inv.client;
+            document.getElementById('gen-inv-modal-doc').innerText = inv.doc || 'N/A';
+            document.getElementById('gen-inv-modal-phone').innerText = inv.phone || 'N/A';
+            document.getElementById('gen-inv-modal-payment').innerText = inv.paymentMethod + (inv.paymentMethod === 'Crédito' ? ` (${inv.creditDays || 30} días)` : '');
+
+            document.getElementById('gen-inv-modal-subtotal').innerText = `$${(inv.subtotal || 0).toFixed(2)}`;
+            document.getElementById('gen-inv-modal-tax').innerText = `$${(inv.tax || 0).toFixed(2)}`;
+            document.getElementById('gen-inv-modal-total').innerText = `$${inv.total.toFixed(2)}`;
+            document.getElementById('gen-inv-modal-total-bs').innerText = `Bs. ${(inv.total * bcvRate).toLocaleString('es-VE', {minimumFractionDigits: 2})}`;
+
+            const itemsTbody = document.getElementById('gen-inv-modal-items-body');
+            itemsTbody.innerHTML = '';
+            (inv.items || []).forEach(item => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="p-2">
+                        <div class="font-bold text-slate-800">${item.name}</div>
+                        <div class="text-[10px] font-mono text-slate-400">${item.sku}</div>
+                    </td>
+                    <td class="p-2 text-center font-medium">${item.qty}</td>
+                    <td class="p-2 text-right">$${item.price.toFixed(2)}</td>
+                    <td class="p-2 text-right font-bold">$${(item.price * item.qty).toFixed(2)}</td>
+                `;
+                itemsTbody.appendChild(tr);
+            });
+
+            document.getElementById('general-invoice-detail-modal').classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        function closeGeneralInvoiceModal() {
+            document.getElementById('general-invoice-detail-modal').classList.add('hidden');
+        }
+
+        function downloadPdfFromGeneralModal() {
+            const activeId = document.getElementById('gen-inv-modal-active-id').value;
+            reprintInvoice(activeId);
+        }
+
+        function duplicateInvoiceFromModal() {
+            const activeId = document.getElementById('gen-inv-modal-active-id').value;
+            const inv = invoices.find(i => i.id === activeId);
+            if (!inv) return;
+
+            switchTab('invoice');
+            closeGeneralInvoiceModal();
+
+            document.getElementById('inv-client-name').value = inv.client || '';
+            document.getElementById('inv-client-doc').value = inv.doc || '';
+            document.getElementById('inv-client-address').value = inv.address || '';
+            document.getElementById('inv-client-phone').value = inv.phone || '';
+            document.getElementById('inv-payment-method').value = inv.paymentMethod || 'Efectivo USD';
+            onPaymentMethodChange();
+
+            currentCart = inv.items ? JSON.parse(JSON.stringify(inv.items)) : [];
+            renderCart();
+            showToast(`Factura ${inv.id} duplicada en el formulario`);
+        }
+
+        /* --- VISOR DETALLADO, EDICIÓN, DUPLICACIÓN Y CONVERSIÓN DE COTIZACIONES --- */
+        function openQuoteDetailModal(quoteId) {
+            const q = quotes.find(item => item.id === quoteId);
+            if (!q) return showToast('Cotización no encontrada', 'error');
+
+            document.getElementById('quote-modal-active-id').value = q.id;
+            document.getElementById('quote-modal-id').innerText = `Cotización ${q.id}`;
+            document.getElementById('quote-modal-date').innerText = `Fecha: ${q.date}`;
+            document.getElementById('quote-modal-client').innerText = q.client;
+            document.getElementById('quote-modal-doc').innerText = q.doc || 'N/A';
+            document.getElementById('quote-modal-phone').innerText = q.phone || 'N/A';
+            document.getElementById('quote-modal-status').innerText = q.status || 'Emitida';
+
+            document.getElementById('quote-modal-subtotal').innerText = `$${(q.subtotal || 0).toFixed(2)}`;
+            document.getElementById('quote-modal-tax').innerText = `$${(q.tax || 0).toFixed(2)}`;
+            document.getElementById('quote-modal-total').innerText = `$${q.total.toFixed(2)}`;
+            document.getElementById('quote-modal-total-bs').innerText = `Bs. ${(q.total * bcvRate).toLocaleString('es-VE', {minimumFractionDigits: 2})}`;
+
+            const itemsTbody = document.getElementById('quote-modal-items-body');
+            itemsTbody.innerHTML = '';
+            (q.items || []).forEach(item => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="p-2">
+                        <div class="font-bold text-slate-800">${item.name}</div>
+                        <div class="text-[10px] font-mono text-slate-400">${item.sku}</div>
+                    </td>
+                    <td class="p-2 text-center font-medium">${item.qty}</td>
+                    <td class="p-2 text-right">$${item.price.toFixed(2)}</td>
+                    <td class="p-2 text-right font-bold">$${(item.price * item.qty).toFixed(2)}</td>
+                `;
+                itemsTbody.appendChild(tr);
+            });
+
+            document.getElementById('quote-detail-modal').classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        function closeQuoteDetailModal() {
+            document.getElementById('quote-detail-modal').classList.add('hidden');
+        }
+
+        function editQuoteFromModal() {
+            const activeId = document.getElementById('quote-modal-active-id').value;
+            const q = quotes.find(item => item.id === activeId);
+            if (!q) return;
+
+            switchTab('quote');
+            closeQuoteDetailModal();
+
+            document.getElementById('editing-quote-id').value = q.id;
+            document.getElementById('quote-number').value = q.id;
+            document.getElementById('quote-client-name').value = q.client || '';
+            document.getElementById('quote-client-doc').value = q.doc || '';
+            document.getElementById('quote-client-address').value = q.address || '';
+            document.getElementById('quote-client-phone').value = q.phone || '';
+            document.getElementById('quote-form-header').innerHTML = `<i data-lucide="edit-3" class="w-5 h-5 text-indigo-600"></i> Editando Cotización ${q.id}`;
+            
+            currentQuoteCart = q.items ? JSON.parse(JSON.stringify(q.items)) : [];
+            renderQuoteCart();
+            showToast(`Cargando cotización ${q.id} para edición`);
+        }
+
+        function duplicateQuoteFromModal() {
+            const activeId = document.getElementById('quote-modal-active-id').value;
+            const q = quotes.find(item => item.id === activeId);
+            if (!q) return;
+
+            switchTab('quote');
+            closeQuoteDetailModal();
+
+            clearQuoteForm();
+            document.getElementById('quote-client-name').value = q.client || '';
+            document.getElementById('quote-client-doc').value = q.doc || '';
+            document.getElementById('quote-client-address').value = q.address || '';
+            document.getElementById('quote-client-phone').value = q.phone || '';
+
+            currentQuoteCart = q.items ? JSON.parse(JSON.stringify(q.items)) : [];
+            renderQuoteCart();
+            showToast(`Cotización duplicada en un nuevo formulario`);
+        }
+
+        function convertQuoteToInvoiceFromModal() {
+            const activeId = document.getElementById('quote-modal-active-id').value;
+            const q = quotes.find(item => item.id === activeId);
+            if (!q) return;
+
+            switchTab('invoice');
+            closeQuoteDetailModal();
+
+            document.getElementById('inv-client-name').value = q.client || '';
+            document.getElementById('inv-client-doc').value = q.doc || '';
+            document.getElementById('inv-client-address').value = q.address || '';
+            document.getElementById('inv-client-phone').value = q.phone || '';
+
+            currentCart = q.items ? JSON.parse(JSON.stringify(q.items)) : [];
+            renderCart();
+            showToast(`Cotización ${q.id} cargada en el módulo de facturación`);
+        }
+
+        function downloadQuotePdfFromModal() {
+            const activeId = document.getElementById('quote-modal-active-id').value;
+            reprintQuote(activeId);
         }
 
         function processReturnDirectly(invoiceId) {
@@ -2259,6 +2999,7 @@
                 renderInventory();
                 renderCheckerResults();
                 renderHistory();
+                renderDashboard();
                 showToast(`Devolución procesada con éxito para ${inv.id}`);
             }
         }
@@ -2271,16 +3012,16 @@
             const doc = new jsPDF();
 
             doc.setFont('inter', 'bold');
-            doc.setFontSize(16);
+            doc.setFontSize(14);
             doc.setTextColor(15, 23, 42);
-            doc.text(currentUser.businessName, 14, 18);
+            doc.text(currentUser.businessName, 14, 16);
 
             doc.setFont('inter', 'normal');
-            doc.setFontSize(9);
+            doc.setFontSize(8);
             doc.setTextColor(100, 116, 139);
-            doc.text(`RIF: ${currentUser.rif}`, 14, 24);
-            doc.text(currentUser.address, 14, 29);
-            doc.text(`Teléfono: ${currentUser.phone}`, 14, 34);
+            doc.text(`RIF: ${currentUser.rif}`, 14, 21);
+            doc.text(currentUser.address, 14, 25, { maxWidth: 100 });
+            doc.text(`Teléfono: ${currentUser.phone}`, 14, 33);
 
             doc.setFillColor(224, 231, 255);
             doc.roundedRect(140, 12, 56, 7, 1, 1, 'F');
@@ -2303,28 +3044,38 @@
             doc.line(14, 40, 196, 40);
 
             doc.setFillColor(248, 250, 252);
-            doc.roundedRect(14, 46, 182, 30, 2, 2, 'F');
+            doc.roundedRect(14, 44, 182, 38, 2, 2, 'F');
             doc.setDrawColor(226, 232, 240);
-            doc.roundedRect(14, 46, 182, 30, 2, 2, 'S');
+            doc.roundedRect(14, 44, 182, 38, 2, 2, 'S');
 
             doc.setFont('inter', 'bold');
             doc.setFontSize(8);
             doc.setTextColor(100, 116, 139);
-            doc.text('CLIENTE', 18, 52);
+            doc.text('CLIENTE Y PAGO', 18, 50);
 
             doc.setFont('inter', 'normal');
             doc.setFontSize(9);
             doc.setTextColor(71, 85, 105);
-            doc.text('Nombre/Razón Social:', 18, 59);
-            doc.text('Identificación:', 110, 59);
-            doc.text('Email:', 18, 68);
+            doc.text('Nombre:', 18, 57);
+            doc.text('Identificación:', 110, 57);
+            doc.text('Dirección:', 18, 65);
+            doc.text('Celular:', 110, 65);
+            doc.text('Método de Pago:', 18, 73);
+            if (inv.paymentMethod === 'Crédito') {
+                doc.text('Plazo de Crédito:', 110, 73);
+            }
 
             doc.setFont('inter', 'bold');
             doc.setTextColor(15, 23, 42);
-            doc.text(inv.client, 52, 59);
-            doc.text(inv.doc, 135, 59);
+            doc.text(inv.client, 35, 57);
+            doc.text(inv.doc || '123456789001', 135, 57);
             doc.setFont('inter', 'normal');
-            doc.text(inv.email, 29, 68);
+            doc.text(inv.address || 'N/A', 36, 65, { maxWidth: 70 });
+            doc.text(inv.phone || 'N/A', 125, 65);
+            doc.text(inv.paymentMethod || 'Efectivo USD', 45, 73);
+            if (inv.paymentMethod === 'Crédito') {
+                doc.text(`${inv.creditDays || 30} Días`, 138, 73);
+            }
 
             const tableRows = inv.items.map(item => [
                 item.sku,
@@ -2335,7 +3086,7 @@
             ]);
 
             doc.autoTable({
-                startY: 84,
+                startY: 86,
                 head: [['CÓDIGO', 'DESCRIPCIÓN', 'CANT.', 'P. UNIT', 'TOTAL']],
                 body: tableRows,
                 theme: 'plain',
@@ -2370,6 +3121,152 @@
 
             doc.save(`${inv.id}.pdf`);
             showToast('PDF regenerado con éxito');
+        }
+
+        // Functions for Credit Details, Cobro Total & Abonos
+        function openCreditDetailModal(invId) {
+            const inv = invoices.find(i => i.id === invId);
+            if (!inv) return showToast('Factura no encontrada', 'error');
+
+            document.getElementById('credit-modal-active-id').value = inv.id;
+            document.getElementById('credit-modal-inv-id').innerText = `Factura ${inv.id}`;
+            document.getElementById('credit-modal-inv-date').innerText = `Fecha de emisión: ${inv.date}`;
+            document.getElementById('credit-modal-client-name').innerText = inv.client;
+            document.getElementById('credit-modal-client-doc').innerText = inv.doc || 'N/A';
+            document.getElementById('credit-modal-client-phone').innerText = inv.phone || 'N/A';
+            document.getElementById('credit-modal-credit-days').innerText = `${inv.creditDays || 30} Días Plazo`;
+
+            const paid = inv.paidAmount || 0;
+            const balance = Math.max(0, inv.total - paid);
+
+            document.getElementById('credit-modal-total').innerText = `$${inv.total.toFixed(2)}`;
+            document.getElementById('credit-modal-total-bs').innerText = `Bs. ${(inv.total * bcvRate).toLocaleString('es-VE', {minimumFractionDigits: 2})}`;
+
+            document.getElementById('credit-modal-paid').innerText = `$${paid.toFixed(2)}`;
+            document.getElementById('credit-modal-paid-bs').innerText = `Bs. ${(paid * bcvRate).toLocaleString('es-VE', {minimumFractionDigits: 2})}`;
+
+            document.getElementById('credit-modal-balance').innerText = `$${balance.toFixed(2)}`;
+            document.getElementById('credit-modal-balance-bs').innerText = `Bs. ${(balance * bcvRate).toLocaleString('es-VE', {minimumFractionDigits: 2})}`;
+
+            const itemsTbody = document.getElementById('credit-modal-items-body');
+            itemsTbody.innerHTML = '';
+            (inv.items || []).forEach(item => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="p-2">
+                        <div class="font-bold text-slate-800">${item.name}</div>
+                        <div class="text-[10px] font-mono text-slate-400">${item.sku}</div>
+                    </td>
+                    <td class="p-2 text-center font-medium">${item.qty}</td>
+                    <td class="p-2 text-right">$${item.price.toFixed(2)}</td>
+                    <td class="p-2 text-right font-bold">$${(item.price * item.qty).toFixed(2)}</td>
+                `;
+                itemsTbody.appendChild(tr);
+            });
+
+            document.getElementById('credit-abono-input').value = '';
+            document.getElementById('credit-detail-modal').classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        function closeCreditDetailModal() {
+            document.getElementById('credit-detail-modal').classList.add('hidden');
+        }
+
+        function processFullPayment() {
+            const invId = document.getElementById('credit-modal-active-id').value;
+            const inv = invoices.find(i => i.id === invId);
+            if (!inv) return;
+
+            const pending = inv.total - (inv.paidAmount || 0);
+            if (pending <= 0) return showToast('Esta factura ya está pagada por completo', 'error');
+
+            if (confirm(`¿Confirmas registrar el COBRO TOTAL de $${pending.toFixed(2)} para la factura ${inv.id}?`)) {
+                inv.paidAmount = inv.total;
+                inv.paymentStatus = 'Pagada';
+                localStorage.setItem('si_invoices', JSON.stringify(invoices));
+                closeCreditDetailModal();
+                renderDashboard();
+                renderHistory();
+                showToast(`¡Cobro registrado con éxito! Factura ${inv.id} saldada por completo.`);
+            }
+        }
+
+        function processPartialPayment() {
+            const invId = document.getElementById('credit-modal-active-id').value;
+            const inv = invoices.find(i => i.id === invId);
+            if (!inv) return;
+
+            const abonoVal = parseFloat(document.getElementById('credit-abono-input').value);
+            if (!abonoVal || abonoVal <= 0) return showToast('Ingresa un monto de abono válido', 'error');
+
+            const currentPaid = inv.paidAmount || 0;
+            const pending = inv.total - currentPaid;
+
+            if (abonoVal > pending + 0.01) {
+                return showToast(`El abono ($${abonoVal.toFixed(2)}) no puede ser mayor al saldo pendiente ($${pending.toFixed(2)})`, 'error');
+            }
+
+            const newPaid = currentPaid + abonoVal;
+            inv.paidAmount = newPaid;
+
+            if (Math.abs(newPaid - inv.total) < 0.01 || newPaid >= inv.total) {
+                inv.paidAmount = inv.total;
+                inv.paymentStatus = 'Pagada';
+                showToast(`¡Abono registrado! La factura ${inv.id} ha quedado completamente saldada.`);
+            } else {
+                inv.paymentStatus = 'Abonada';
+                showToast(`Abono de $${abonoVal.toFixed(2)} registrado. Saldo restante: $${(inv.total - newPaid).toFixed(2)}`);
+            }
+
+            localStorage.setItem('si_invoices', JSON.stringify(invoices));
+            openCreditDetailModal(inv.id);
+            renderDashboard();
+            renderHistory();
+        }
+
+        // Functions for Client Pending Credit Alert
+        function checkClientPendingCredit(clientDocOrName) {
+            if (!clientDocOrName || !clientDocOrName.trim()) return;
+            const search = clientDocOrName.trim().toLowerCase();
+
+            const pendingInvoices = invoices.filter(inv => 
+                inv.paymentMethod === 'Crédito' && 
+                !inv.returned && 
+                (inv.paymentStatus !== 'Pagada' && (inv.total - (inv.paidAmount || 0)) > 0.009) &&
+                ((inv.doc && inv.doc.toLowerCase() === search) || (inv.client && inv.client.toLowerCase() === search))
+            );
+
+            if (pendingInvoices.length > 0) {
+                const totalDebt = pendingInvoices.reduce((acc, inv) => acc + (inv.total - (inv.paidAmount || 0)), 0);
+                const totalDebtBs = totalDebt * bcvRate;
+
+                document.getElementById('alert-client-name').innerText = pendingInvoices[0].client;
+                document.getElementById('alert-client-total-usd').innerText = `$${totalDebt.toFixed(2)}`;
+                document.getElementById('alert-client-total-bs').innerText = `Bs. ${totalDebtBs.toLocaleString('es-VE', {minimumFractionDigits: 2})}`;
+
+                const listEl = document.getElementById('alert-client-invoices-list');
+                listEl.innerHTML = '';
+                pendingInvoices.forEach(inv => {
+                    const pend = inv.total - (inv.paidAmount || 0);
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = "flex justify-between items-center text-[11px] py-1 border-b border-slate-200 last:border-0";
+                    itemDiv.innerHTML = `
+                        <div>
+                            <span class="font-mono font-bold text-indigo-600">${inv.id}</span> (${inv.date})
+                        </div>
+                        <div class="font-bold text-rose-600">Pendiente: $${pend.toFixed(2)}</div>
+                    `;
+                    listEl.appendChild(itemDiv);
+                });
+
+                document.getElementById('client-pending-alert-modal').classList.remove('hidden');
+                lucide.createIcons();
+            }
+        }
+
+        function closePendingCreditAlert() {
+            document.getElementById('client-pending-alert-modal').classList.add('hidden');
         }
 
         function saveCloudUrl() {
