@@ -1225,7 +1225,10 @@
             { code: 'HER', name: 'Herramientas y Ferretería' },
             { code: 'GEN', name: 'General / Varios' }
         ];
-
+        let inventory = JSON.parse(localStorage.getItem('si_inventory')) || [
+            { id: '1', family: 'ELE', sku: 'ELE-001', name: 'TRANSFORMADOR MONOFASICO 15 KVA', cost: 650.00, margin: 30, price: 850.00, stock: 12 },
+            { id: '2', family: 'CAB', sku: 'CAB-001', name: 'CABLE UTP CAT6 BOBINA X 305M', cost: 35.00, margin: 28.5, price: 45.00, stock: 20 }
+        ];
         
 
         let invoices = JSON.parse(localStorage.getItem('si_invoices')) || [];
